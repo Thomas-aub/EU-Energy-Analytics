@@ -1,0 +1,6 @@
+data/
+*.sublime-workspace
+.DS_Store
+dist/
+node_modules
+npm-debug.log
