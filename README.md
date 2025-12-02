@@ -1,46 +1,66 @@
-# EU-Energy-Analytics
+# Document de cadrage : EU-Energy-Analytics
+
+### Quel est le problème abordé / à quel besoin répondons-nous ?
+
+L'Europe traverse une double crise énergétique et climatique qui rend la compréhension de nos sources d'énergie plus cruciale que jamais. Le problème abordé est la difficulté pour un citoyen de saisir globalement les enjeux énergétiques européens : quels pays sont réellement les plus "verts" ? De qui dépendons-nous pour notre approvisionnement ?
+
+Nous répondons au besoin de vulgariser et d'explorer ces données complexes. L'objectif est de permettre à l'utilisateur de dépasser les idées reçues en visualisant concrètement la production (nucléaire, renouvelable, fossile), les échanges transfrontaliers (import/export) et l'évolution historique de la dépendance énergétique des pays de l'UE.
+
+### À qui s’adresse la visualisation, quelles tâches seront effectuées au travers de notre projet ?
+
+**Public cible :**
+Le projet s'adresse principalement aux **citoyens européens éclairés** (étudiants, journalistes, personnes intéressées par l'écologie) souhaitant une vue macroscopique rapide.
+
+**Tâches principales :**
+
+1.  **Comparer le mix énergétique (Vert vs Polluant) :** L'utilisateur pourra classer les pays selon leur part d'énergie renouvelable vs fossile et voir l'intensité carbone de leur production.
+2.  **Analyser l'indépendance énergétique :** Identifier quels pays sont exportateurs nets ou importateurs nets, et visualiser les flux d'énergie pour comprendre les dépendances géopolitiques.
+3.  **Observer la transition temporelle :** Visualiser l'évolution des consommations sur les 20 dernières années pour identifier les pays qui ont réussi leur transition énergétique et ceux qui stagnent.
+
+### Sources de données choisies
+
+**Source principale :**
+
+  * **IEA (International Energy Agency) - Energy Balances :**
+      * *Lien :* [IEA Data Browser](https://www.iea.org/data-and-statistics/data-tools/energy-statistics-data-browser?country=FRANCE&energy=Balances&year=2020)
+      * *Intérêt :* Données de référence mondiale, standardisées et couvrant les bilans complets (pas seulement l'électricité, mais l'énergie totale).
+      * *Limites :* Certaines données récentes peuvent être agrégées ou manquantes pour les années courantes (N-1).
+
+**Plan de secours / Source complémentaire :**
+
+  * **Eurostat (https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_c/) :** 
+  Si l'API ou l'extraction IEA s'avère complexe ou limitée, nous utiliserons les jeux de données Open Data d'Eurostat qui sont très complets pour l'UE et permettent des téléchargements en CSV/JSON faciles.
+
+### Travaux importants liés au projet
+
+1.  **Electricity Maps (https://app.electricitymaps.com/map/live/fifteen_minutes) :**
+      * *Description :* Une carte en temps réel montrant l'intensité carbone et les échanges d'électricité.
+      * *Intérêt/Amélioration :* C'est la référence pour le "temps réel". Notre projet se distinguera en se concentrant sur l'analyse historique (évolution sur 20 ans) et sur l'énergie globale (incluant chauffage/transport) et pas uniquement l'électricité.
+2.  **Outil interactif Sankey d'Eurostat (https://ec.europa.eu/eurostat/cache/sankey/energy/sankey.html) :**
+      * *Description :* Un diagramme de flux montrant la source d'énergie jusqu'à son utilisation finale.
+      * *Intérêt/Amélioration :* Très complet mais visuellement complexe et austère pour le grand public. Nous souhaitons proposer une interface plus guidée et narrative (Scrollytelling).
+3.  **Our World in Data - Energy (https://ourworldindata.org/energy) :**
+      * *Description :* Articles riches en graphiques statiques ou interactifs simples (line charts).
+      * *Intérêt/Amélioration :* Excellente pédagogie. Nous voulons reprendre cette clarté mais en permettant une exploration plus libre et comparative (ex: comparer directement la courbe de la France vs celle de l'Allemagne sur un même graphe).
 
 
-https://www.iea.org/data-and-statistics/data-tools/energy-statistics-data-browser?country=FRANCE&energy=Balances&year=2020
+### Organisation
 
+* **Moyens de communication :**
+    * Discord pour les échanges quotidiens et le partage de liens.
 
+* **Sessions de travail :**
+    * Une session hebdomadaire (en présentiel ou distanciel) le jeudi matin à 11h.
+    * Point synchrone sur Discord le lundi ou mardi soir pour définir les objectifs de la semaine.
+    * Travail individuel asynchrone avec un suivi documenté de l'avancement.
 
+* **Rôles :**
+    * **Thomas** est responsable du suivi de la documentation, de la cohérence des visualisations et de l'organisation générale.
+    * **Fantin** est responsable de l'extraction et du traitement des données.
+    * **Nessim** est responsable de la visualisation en D3.js, de l'architecture du code et des interactions complexes.
 
-# Document de cadrage
+    *Note : Le groupe n'étant composé que de 3 personnes, ces rôles servent avant tout à définir des responsables pour le suivi, la maintenance et la cohérence du projet. Il est entendu que tous les membres du groupe seront amenés à travailler de manière transversale sur ces trois aspects.*
 
-Ce document a pour objectif de :
+### Scan des esquisses 
 
-* Finaliser le cadrage du projet (sujet, disponibilité des données, approche, etc.)
-* Identifier les travaux important liés au projet
-* Proposer les premières pistes de conception
-* Valider vos choix techniques
-
-Mettre ce document en ligne sur une page dédiée de votre wiki de votre projet github (public). Mettre ce lien dans la feuille de suivi de projet. Ce document servira de base à un autre groupe pour vous faire des retours.
-
-## Structure attendue du document de cadrage
-
-### Quel est le problème abordé / à quel besoin répondez vous ?
-
-Expliquer en un paragraphe le problème que vous abordez, et le besoin auquel vous souhaitez répondre.
-
-### À qui s’adresse la visualisation, quelles tâches seront effectuées au travers de votre projet ?
-
-Clarifier le public principal de votre projet. Lister 3 tâches que votre projet permettra d’effectuer. Par ex. : “identifier l'application qui consomme le plus de données sur mon smartphone”. Expliquer pourquoi ces tâches vous semblent les plus importantes.
-
-### Sources de données choisies
-
-Lister les sources de données identifiées, pour chacune identifier leur intérêt principal et leurs limites potentielles. Clarifier si vous souhaitez en fusionner plusieurs ou pensez privilégier une en particulier. En cas de surprise/problème imprévu lié aux données, quel est votre plan de secours ?
-
-### Travaux important liés au projet
-
-Lister 3 projets liés au votre, par exemple : des projets avec des jeux de données similaires, des projets proposant des techniques de visualisation que vous trouvez intéressantes, des articles scientifiques présentant une technique ou une description du problème qui vous sera utile... Pour chaque travail, expliquer en quoi il vous semble intéressant par rapport à votre projet, et en quoi il pourrait être amélioré.
-
-### Organisation
-
-* Quels moyens de communications avez vous mis en place (email, tracking github, slack...) ?
-* Quelles sessions de travail avez vous prévu hors du cours d’ici à la soutenance de janvier ?
-* Quels rôles avez vous identifiés au sein du groupe (design, développement D3, pré-traitement des données, suivi, etc.) ? Ces rôles ne sont pas exclusifs, et il est attendu que tout le monde contribue à la conception et au code des visualisations. Nous utilisons les fonctions de suivi de projet de github pour évaluer en partie la contribution de chacun au projet.
-
-### Scan des esquisses finales
-
-Si votre projet a évolué depuis, en créer de nouvelles.
+**TODO**
