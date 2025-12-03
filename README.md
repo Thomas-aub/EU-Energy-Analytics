@@ -61,6 +61,50 @@ Le projet s'adresse principalement aux **citoyens européens éclairés** (étud
 
     *Note : Le groupe n'étant composé que de 3 personnes, ces rôles servent avant tout à définir des responsables pour le suivi, la maintenance et la cohérence du projet. Il est entendu que tous les membres du groupe seront amenés à travailler de manière transversale sur ces trois aspects.*
 
-### Scan des esquisses 
 
-**TODO**
+
+### Scan des esquisses finales
+
+Nous avons exploré plusieurs pistes graphiques pour répondre aux tâches identifiées. Voici les quatre visualisations retenues, détaillées selon une structure commune :
+
+#### 1\. Vue Spatiale : Carte de l'Europe
+
+  * **Objectif :** Servir de point d'entrée pour une comparaison géographique immédiate. Elle permet d'identifier rapidement les bons et les mauvais élèves en termes de mix énergétique.
+  * **Encodage visuel :** Carte choroplèthe. Chaque pays est coloré selon une échelle divergente (du Rouge au Vert) représentant le ratio *Énergie Décarbonée / Énergie Carbonée*.
+  * **Interactions :**
+      * **Tooltip (Survol) :** Affiche le nom du pays, la valeur précise du ratio et la production totale.
+      * **Slider temporel :** Permet de voir l'évolution de la carte année par année.
+      * **Filtres (Optionnel) :** Nous envisageons d'ajouter un sélecteur permettant de basculer la carte selon trois modes :
+        1.  *Ratio carbone* (vue par défaut).
+        2.  *Consommation par habitant* (plus la couleur est intense, plus la consommation est élevée).
+        3.  *Balance commerciale* (Bleu = Exportateur net, Rouge = Importateur net).
+
+\<img src="asset/pictures/IMG\_5061.jpg" width="600" alt="Esquisse Carte Europe"\>
+
+#### 2\. Vue Temporelle : Évolution du Mix
+
+  * **Objectif :** Comprendre l'histoire énergétique d'un pays spécifique. Elle montre la transition énergétique (ex: essor du nucléaire, déclin du charbon) sur le long terme.
+  * **Encodage visuel :** *Stacked Area Chart* (Graphique en aires empilées). L'axe X représente le temps, l'axe Y la quantité d'énergie (en TJ), et les couches de couleurs correspondent aux différentes sources (Charbon, Gaz, Nucléaire, etc.).
+  * **Interactions :**
+      * **Tooltip (Survol) :** Une ligne verticale suit la souris pour indiquer l'année exacte. Une infobulle affiche alors le détail chiffré de chaque source d'énergie pour cette année-là.
+
+\<img src="asset/pictures/IMG\_5058.jpg" width="600" alt="Esquisse Evolution Temporelle"\>
+
+#### 3\. Vue Comparative : Détail de la Production
+
+  * **Objectif :** Comparer finement les volumes et les types de production entre plusieurs pays. Contrairement à la carte qui montre un ratio, ici on compare des quantités absolues et leur répartition.
+  * **Encodage visuel :** *Grouped Bar Chart* (Histogramme groupé). L'axe X liste les pays sélectionnés, l'axe Y la quantité. Chaque pays possède plusieurs barres correspondant aux types d'énergie (Vert, Pétrole, Charbon).
+  * **Interactions :**
+      * **Tooltip (Survol) :** Au survol d'une barre spécifique, l'infobulle affiche le pays, le type d'énergie précis et le volume de production exact.
+
+\<img src="asset/pictures/IMG\_5059.jpg" width="600" alt="Esquisse Comparaison Production"\>
+
+#### 4\. Vue Classement : Consommation par Habitant
+
+  * **Objectif :** Normaliser les données pour comparer l'efficacité ou la "gourmandise" énergétique des pays, indépendamment de leur taille démographique.
+  * **Encodage visuel :** *Horizontal Bar Chart* (Barres horizontales). Les pays sont triés par ordre décroissant de consommation (kWh/pers). La longueur de la barre représente l'intensité de la consommation.
+  * **Interactions :**
+      * **Tooltip (Survol) :** Affiche la valeur exacte en kWh/habitant et le rang du pays dans le classement européen.
+      * **Slider temporel :** Lié à la vue principale, permet de voir l'évolution du classement dans le temps.
+
+\<img src="asset/pictures/IMG\_5060.jpg" width="600" alt="Esquisse Consommation par habitant"\>
