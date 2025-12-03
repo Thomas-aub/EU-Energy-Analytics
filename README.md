@@ -79,7 +79,8 @@ Nous avons exploré plusieurs pistes graphiques pour répondre aux tâches ident
         2.  *Consommation par habitant* (plus la couleur est intense, plus la consommation est élevée).
         3.  *Balance commerciale* (Bleu = Exportateur net, Rouge = Importateur net).
 
-\<img src="asset/pictures/IMG\_5061.jpg" width="600" alt="Esquisse Carte Europe"\>
+
+<img src="asset/pictures/IMG_5061.jpg" alt="isolated" width="500"/>
 
 #### 2\. Vue Temporelle : Évolution du Mix
 
@@ -88,7 +89,9 @@ Nous avons exploré plusieurs pistes graphiques pour répondre aux tâches ident
   * **Interactions :**
       * **Tooltip (Survol) :** Une ligne verticale suit la souris pour indiquer l'année exacte. Une infobulle affiche alors le détail chiffré de chaque source d'énergie pour cette année-là.
 
-\<img src="asset/pictures/IMG\_5058.jpg" width="600" alt="Esquisse Evolution Temporelle"\>
+
+<img src="asset/pictures/IMG_5058.jpg" alt="isolated" width="500"/>
+
 
 #### 3\. Vue Comparative : Détail de la Production
 
@@ -97,7 +100,8 @@ Nous avons exploré plusieurs pistes graphiques pour répondre aux tâches ident
   * **Interactions :**
       * **Tooltip (Survol) :** Au survol d'une barre spécifique, l'infobulle affiche le pays, le type d'énergie précis et le volume de production exact.
 
-\<img src="asset/pictures/IMG\_5059.jpg" width="600" alt="Esquisse Comparaison Production"\>
+
+<img src="asset/pictures/IMG_5059.jpg" alt="isolated" width="500"/>
 
 #### 4\. Vue Classement : Consommation par Habitant
 
@@ -107,4 +111,8 @@ Nous avons exploré plusieurs pistes graphiques pour répondre aux tâches ident
       * **Tooltip (Survol) :** Affiche la valeur exacte en kWh/habitant et le rang du pays dans le classement européen.
       * **Slider temporel :** Lié à la vue principale, permet de voir l'évolution du classement dans le temps.
 
-\<img src="asset/pictures/IMG\_5060.jpg" width="600" alt="Esquisse Consommation par habitant"\>
+<img src="asset/pictures/IMG_5060.jpg" alt="isolated" width="500"/>
+
+
+
+
