@@ -13,17 +13,20 @@ const AGGREGATES = [
     "Renewable Combustible Fuels"
 ];
 
+
+let x, y;
 const tooltip = d3.select("body").append("div").attr("id", "tooltip");
 
 let globalData = [];
 let colorScale;
 
+
+
 async function start() {
     try {
-        // Chemin relatif au fichier production.html
         const response = await fetch("./data/MES_0925.csv");
         const rawText = await response.text();
-        
+
         const lines = rawText.trim().split(/\r?\n/);
         // Recherche robuste de l'entête
         const headerIndex = lines.findIndex(line => line.includes("Country") && line.includes("Balance"));
@@ -34,10 +37,9 @@ async function start() {
         const rawData = d3.csvParse(cleanCsvContent);
         const parseDate = d3.timeParse("%B %Y");
 
-        // Importation filtrée : Production et Consommation uniquement
         globalData = rawData
-            .filter(d => 
-                EUROPE_COUNTRIES.includes(d.Country) && 
+            .filter(d =>
+                EUROPE_COUNTRIES.includes(d.Country) &&
                 (d.Balance === "Net Electricity Production" || d.Balance === "Final Consumption (Calculated)")
             )
             .map(d => ({
@@ -54,12 +56,12 @@ async function start() {
 
         hideLoader();
         populateCountries();
-        
+
         d3.select("#finalConsumptionChk").on("change", updateChart);
         d3.select("#selectAllBtn").on("click", toggleAll);
         d3.select("#countrySelect").on("change", render);
 
-        render(); 
+        render();
     } catch (err) {
         d3.select("#loader").text("Erreur: " + err.message);
         console.error(err);
@@ -75,8 +77,8 @@ function populateCountries() {
 
 function render() {
     const country = d3.select("#countrySelect").property("value");
-    const prodData = globalData.filter(d => 
-        d.country === country && 
+    const prodData = globalData.filter(d =>
+        d.country === country &&
         d.balance === "Net Electricity Production" &&
         !AGGREGATES.includes(d.product) &&
         d.value !== 0
@@ -121,13 +123,13 @@ function updateChart() {
     const country = d3.select("#countrySelect").property("value");
     const showFinalConsumption = d3.select("#finalConsumptionChk").property("checked");
     const selectedSources = [];
-    d3.selectAll("#source-checklist input:checked").each(function() { selectedSources.push(this.value); });
+    d3.selectAll("#source-checklist input:checked").each(function () { selectedSources.push(this.value); });
 
     d3.select("#chartTitle").text(`Total Net Electricity Production - ${country}`);
 
-    let filtered = globalData.filter(d => 
-        d.country === country && 
-        d.balance === "Net Electricity Production" && 
+    let filtered = globalData.filter(d =>
+        d.country === country &&
+        d.balance === "Net Electricity Production" &&
         selectedSources.includes(d.product)
     );
 
@@ -151,11 +153,32 @@ function updateChart() {
 
     drawLineChart(chartData, keys, d3.max(chartData, d => d3.max(keys, k => d[k] || 0)) || 100);
 }
+function showTooltip(event, key, points, color) {
+    const [mouseX] = d3.pointer(event);
+    const xDate = x.invert(mouseX);
+    const bisect = d3.bisector(d => d.date).left;
+    const i = bisect(points, xDate);
+    const d = points[i];
+
+    if (d) {
+        tooltip
+            .style("display", "block")
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 35) + "px")
+            .html(`
+                <div style="border-left: 4px solid ${color}; padding-left: 8px; background: white; padding: 5px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <strong style="color: ${color === "#000" ? "#333" : color}">${key}</strong><br>
+                    <small>${d3.timeFormat("%B %Y")(d.date)}</small><br>
+                    <strong>${d3.format(",.0f")(d.value)} GWh</strong>
+                </div>
+            `);
+    }
+}
 
 function drawLineChart(data, keys, yMax) {
     const container = document.getElementById("chart");
-    d3.select("#chart").selectAll("*").remove(); // Nettoyage du graphique précédent
-    
+    d3.select("#chart").selectAll("*").remove();
+
     const margin = { top: 20, right: 200, bottom: 40, left: 70 };
     const width = container.clientWidth - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
@@ -166,40 +189,51 @@ function drawLineChart(data, keys, yMax) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3.scaleTime().domain(d3.extent(data, d => d.date)).range([0, width]);
-    const y = d3.scaleLinear().domain([0, yMax]).nice().range([height, 0]);
+    x = d3.scaleTime().domain(d3.extent(data, d => d.date)).range([0, width]);
+    y = d3.scaleLinear().domain([0, yMax]).nice().range([height, 0]);
 
     keys.forEach(key => {
         const isCons = key === "Final Consumption";
         const points = data.map(d => ({ date: d.date, value: d[key] || 0 }));
 
-        svg.append("path")
+        const g = svg.append("g");
+
+        if (!isCons) {
+            g.append("path")
+                .datum(points)
+                .attr("fill", colorScale(key))
+                .attr("fill-opacity", 0.4)
+                .attr("d", d3.area().x(d => x(d.date)).y0(y(0)).y1(d => y(d.value)).curve(d3.curveMonotoneX))
+                .style("cursor", "pointer")
+                .on("mouseover", function () { d3.select(this).attr("fill-opacity", 0.7); })
+                .on("mousemove", (event) => showTooltip(event, key, points, colorScale(key)))
+                .on("mouseleave", function () {
+                    d3.select(this).attr("fill-opacity", 0.4);
+                    tooltip.style("display", "none");
+                });
+        }
+
+        g.append("path")
             .datum(points)
             .attr("fill", "none")
             .attr("stroke", isCons ? "#000" : colorScale(key))
-            .attr("stroke-width", isCons ? 3 : 2.5)
+            .attr("stroke-width", isCons ? 3 : 2)
             .attr("stroke-dasharray", isCons ? "5,5" : "0")
             .attr("d", d3.line().x(d => x(d.date)).y(d => y(d.value)).curve(d3.curveMonotoneX))
-            // LOGIQUE DE L'INFOBULLE
-            .on("mousemove", function(event) {
-                const [mouseX] = d3.pointer(event);
-                const xDate = x.invert(mouseX);
-                
-                // Trouver la donnée la plus proche
-                const bisect = d3.bisector(d => d.date).left;
-                const i = bisect(points, xDate);
-                const d = points[i];
+            .style("pointer-events", "none");
 
-                if (d) {
-                    tooltip.style("display", "block")
-                        .style("left", (event.pageX + 15) + "px")
-                        .style("top", (event.pageY - 35) + "px")
-                        .html(`<strong>${key}</strong><br>
-                               Date: ${d3.timeFormat("%b %Y")(d.date)}<br>
-                               Valeur: ${d3.format(",.0f")(d.value)} GWh`);
-                }
-            })
-            .on("mouseout", () => tooltip.style("display", "none"));
+        if (isCons) {
+            g.append("path")
+                .datum(points)
+                .attr("fill", "none")
+                .attr("stroke", "transparent")
+                .attr("stroke-width", 20)
+                .attr("d", d3.line().x(d => x(d.date)).y(d => y(d.value)).curve(d3.curveMonotoneX))
+                .style("cursor", "pointer")
+                .style("pointer-events", "stroke")
+                .on("mousemove", (event) => showTooltip(event, key, points, "#000"))
+                .on("mouseleave", () => tooltip.style("display", "none"));
+        }
     });
     svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
     svg.append("g").call(d3.axisLeft(y).tickFormat(d => d3.format(",.0f")(d)));
@@ -214,3 +248,4 @@ function drawLineChart(data, keys, yMax) {
 
 function hideLoader() { d3.select("#loader").style("display", "none"); }
 start();
+
