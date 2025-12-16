@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEA Electricity Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>European Electricity Data Explorer</h1>
+        <p>Source: IEA Monthly Electricity Statistics (Updated Dec 2025)</p>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="filter-group">
+                <label for="countrySelect">Country</label>
+                <select id="countrySelect"></select>
+            </div>
+            <div class="filter-group">
+                <label>Energy Sources</label>
+                <div id="source-checklist" class="checklist">
+                </div>
+                <button id="selectAllBtn">Select All</button>
+            </div>
+            <div id="finalConsumptionContainer">
+                <input type="checkbox" id="finalConsumptionChk">
+                <label for="finalConsumptionChk">Show Final Consumption</label>
+            </div>
+        </aside>
+        
+        <main class="content">
+            <h2 id="chartTitle" style="text-align: center; font-family: sans-serif;"></h2>
+        <div id="chart"></div>
+            <div id="chart"></div>
+            <div id="loader" class="status">Loading CSV data...</div>
+        </main>
+    </div>
+
+
+    <script src="script.js" type="module"></script>
+</body>
+
+</html>
