@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Production - IEA Electricity Explorer</title>
-    <head>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="./css/style.css">
-</head>
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
@@ -19,7 +17,6 @@
                 <li><a href="production.html" class="active">Production</a></li>
             </ul>
         </nav>
-
     </header>
 
     <div class="container">
@@ -32,10 +29,10 @@
             <div class="filter-group">
                 <label>Energy Sources</label>
                 <div id="source-checklist" class="checklist"></div>
-                <button id="selectAllBtn" class="btn">Select All</button>
+                <button id="selectAllBtn" class="btn">Toggle All</button>
             </div>
 
-            <div id="finalConsumptionContainer" class="checklist-item">
+            <div id="finalConsumptionContainer" class="checklist-item" style="display:none;">
                 <input type="checkbox" id="finalConsumptionChk">
                 <label for="finalConsumptionChk">Show Final Consumption</label>
             </div>
@@ -48,6 +45,6 @@
         </main>
     </div>
 
-    <script src="./js/script.js" type="module"></script>
+    <script src="./js/script.js"></script>
 </body>
 </html>
