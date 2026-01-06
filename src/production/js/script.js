@@ -7,12 +7,21 @@ const EUROPE_COUNTRIES = [
 ];
 
 const TRANSLATIONS = {
+    // Énergies
     "Nuclear": "Nucléaire", "Gas": "Gaz", "Coal": "Charbon", "Solar": "Solaire",
     "Wind": "Éolien", "Hydro": "Hydraulique", "Oil": "Pétrole", "Bioenergy": "Bioénergie",
     "Other Renewables Excluding Bioenergy": "Autres renouvelables",
-    "Austria": "Autriche", "Belgium": "Belgique", "Czechia": "Tchéquie", "Denmark": "Danemark",
-    "Germany": "Allemagne", "France": "France", "Italy": "Italie", "Spain": "Espagne",
-    "United Kingdom": "Royaume-Uni"
+    
+    // Pays
+    "Austria": "Autriche", "Belgium": "Belgique", "Czechia": "Tchéquie", 
+    "Denmark": "Danemark", "Estonia": "Estonie", "Finland": "Finlande",
+    "France": "France", "Germany": "Allemagne", "Greece": "Grèce", 
+    "Hungary": "Hongrie", "Iceland": "Islande", "Ireland": "Irlande", 
+    "Italy": "Italie", "Latvia": "Lettonie", "Lithuania": "Lituanie", 
+    "Luxembourg": "Luxembourg", "Netherlands": "Pays-Bas", "Norway": "Norvège", 
+    "Poland": "Pologne", "Portugal": "Portugal", "Slovakia": "Slovaquie", 
+    "Slovenia": "Slovénie", "Spain": "Espagne", "Sweden": "Suède", 
+    "Switzerland": "Suisse", "Turkey": "Turquie", "United Kingdom": "Royaume-Uni"
 };
 
 const t = (word) => TRANSLATIONS[word] || word;
@@ -103,7 +112,7 @@ function render() {
 
     let toCheck;
     if (!userHasManuallyChanged) {
-        toCheck = availableProducts.slice(0, 5);
+        toCheck = availableProducts.slice(0, 3);
     } else {
         toCheck = [];
         d3.selectAll("#source-checklist input:checked").each(function() {
