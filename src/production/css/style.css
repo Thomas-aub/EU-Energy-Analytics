@@ -38,7 +38,6 @@ select {
     background: white;
 }
 
-/* Style unifié pour les items de la checklist et la consommation finale */
 .checklist-item, #finalConsumptionContainer {
     display: flex;
     align-items: center;
@@ -100,4 +99,25 @@ select {
     margin-top: 20%;
     font-style: italic;
     color: #64748b;
+}
+
+.consumption-row {
+    display: flex;          
+    align-items: center;   
+    gap: 8px;              
+    white-space: nowrap;    
+    margin-top: 15px;
+    padding: 5px 0;
+}
+
+.consumption-row label {
+    cursor: pointer;
+    font-size: 14px;      
+}
+
+.consumption-row input[type="checkbox"] {
+    cursor: pointer;
+    margin: 0;             
+    width: 16px;           
+    height: 16px;
 }
