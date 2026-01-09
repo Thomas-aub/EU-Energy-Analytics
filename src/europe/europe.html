@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte Europe - DataViz</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Librairie D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <h1>European Electricity Data Explorer</h1>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="../index.html">Accueil</a></li>
+        <li><a href="../production/production.html">Production</a></li>
+        <li><a class="active" href="./europe.html">Carte d'Europe</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container map-layout">
+    <main class="content">
+      <h2 class="title">Carte européenne</h2>
+  
+      <div class="viz-row">
+        <!-- Map Section -->
+        <div class="viz-wrap">
+          <svg id="map" aria-label="Carte Europe"></svg>
+          <div id="tooltip" class="tooltip" style="display:none;"></div>
+        </div>
+  
+        <!-- Controls Section -->
+        <aside class="controls">
+          <h2>Options</h2>
+          <div class="filter-group">
+            <label for="metric">Indicateur</label>
+            <select id="metric">
+              <option value="ratio">Ratio décarbonné / décarbonné + carbonné</option>
+              <option value="trade">Exportation / Importation (net)</option>
+              <option value="conso">Consommation / habitant</option>
+            </select>
+          </div>
+          <div class="legend" id="legend"></div>
+          <div class="metric-desc" id="metricDesc"></div>
+        </aside>
+      </div>
+  
+      <!-- Year Slider -->
+      <div class="year-bar">
+        <label for="year">Période : <span id="yearLabel"></span></label>
+        <input id="year" type="range" min="1990" max="2020" step="1" value="2000" />
+        <datalist id="yearTicks"></datalist>
+      </div>
+  
+      <!-- Status -->
+      <div id="status" class="status">Chargement…</div>
+    </main>
+  </div>
+
+  <!-- Script -->
+  <script src="./js/europe.js"></script>
+</body>
+</html>
