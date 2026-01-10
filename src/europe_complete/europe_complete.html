@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explorateur Énergétique Européen</title>
+
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    /* ... (CSS Existant inchangé) ... */
+    body { background-color: #f8fafc; color: #1e293b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .main-view-container { width: 100%; position: relative; padding-top: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
+    .hidden { display: none !important; }
+    .view-header { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+    .view-title { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0; }
+    .view-desc { font-size: 0.95rem; color: #475569; line-height: 1.6; max-width: 950px; text-align: justify; }
+    .view-desc strong { color: #0f172a; font-weight: 600; }
+    .ui-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+    .main-view-switch { display: flex; background: #fff; padding: 4px; border-radius: 8px; position: absolute; top: 20px; right: 20px; z-index: 500; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+    .view-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-weight: 600; color: #64748b; font-size: 0.9rem; transition: all 0.2s ease; }
+    .view-btn:hover { color: #334155; background-color: #f1f5f9; }
+    .view-btn.active { background-color: #f1f5f9; color: #0f172a; font-weight: 700; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+    .slider-container { background: #f8fafc; padding: 10px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; margin-top: 15px; }
+    .slider-container.hidden { display: none; }
+    input[type=range] { cursor: pointer; width: 100%; }
+    .map-layout .viz-row { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; margin-bottom: 20px; }
+    .viz-wrap { background: white !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 650px; position: relative; overflow: hidden; }
+    .map-controls-card { padding: 24px; display: flex; flex-direction: column; gap: 15px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .map-controls-card h2 { font-size: 1.1rem; margin: 0; color: #0f172a; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; }
+    .styled-select-wrapper { position: relative; }
+    select#metric { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background-color: #fff; color: #334155; font-weight: 600; font-size: 0.95rem; cursor: pointer; appearance: none; transition: border-color 0.2s; }
+    select#metric:hover { border-color: #94a3b8; }
+    .styled-select-wrapper::after { content: "▼"; font-size: 0.7rem; color: #64748b; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .info-box { background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 4px 8px 8px 4px; padding: 16px; margin-top: 10px; }
+    .info-title { display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 700; margin-bottom: 6px; }
+    .info-content { font-size: 0.95rem; color: #334155; line-height: 1.5; margin-bottom: 12px; }
+    .info-reading-key { font-size: 0.85rem; color: #475569; font-weight: 500; background: #e2e8f0; padding: 6px 10px; border-radius: 6px; display: inline-block; }
+    .legend-container { margin-top: 5px; }
+    .legend-gradient { height: 12px; width: 100%; border-radius: 6px; margin-bottom: 6px; }
+    .legend-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: #64748b; font-weight: 500; }
+    .grid-toolbar { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 30px; }
+    .internal-view-switch { display: flex; background: #fff; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .separator { width: 1px; height: 30px; background: #cbd5e1; margin: 0 5px; }
+    #charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; width: 100%; padding-bottom: 50px; }
+    
+    /* MODIF CSS : Curseur pointer pour les cartes */
+    .country-card { padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    
+    .country-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .country-title { font-weight: 700; margin-bottom: 8px; text-align: center; font-size: 0.9rem; height: 25px; display: flex; align-items: center; justify-content: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #334155; }
+    .responsive-svg { width: 100%; height: auto; display: block; overflow: visible; }
+    #legend-content { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.85rem; color: #475569; margin-top: 5px; }
+    .legend-item { display: flex; align-items: center; font-weight: 500; }
+    .legend-color { width: 12px; height: 12px; border-radius: 2px; margin-right: 8px; }
+    .icon-svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .hover-line { stroke: #64748b; stroke-width: 1px; stroke-dasharray: 4 4; opacity: 0; pointer-events: none; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>European Electricity Data Explorer</h1>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="../index.html">Accueil</a></li>
+        <li><a href="../production/production.html">Production</a></li>
+        <li><a class="active" href="#">Carte & Données</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="main-view-switch">
+      <button id="btn-show-map" class="view-btn active" onclick="toggleMainView('map')">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg> Carte
+      </button>
+      <button id="btn-show-grid" class="view-btn" onclick="toggleMainView('grid')">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Mosaïque
+      </button>
+  </div>
+
+  <div id="view-map-container" class="main-view-container">
+      <div class="container map-layout">
+        <main class="content">
+          <div class="view-header">
+              <h2 class="view-title">Spatialisation des Indicateurs Énergétiques</h2>
+              <div class="view-desc">
+                  Cette cartographie interactive met en évidence les hétérogénéités géographiques de la transition énergétique en Europe.
+                  Elle permet de croiser trois dimensions : la structure de la production (mix), les dépendances commerciales et le niveau de consommation.
+              </div>
+          </div>
+          <div class="viz-row">
+            <div class="viz-wrap ui-card">
+              <svg id="map" aria-label="Carte Europe"></svg>
+              <div id="tooltip" class="tooltip" style="display:none;"></div>
+            </div>
+            <aside class="controls map-controls-card">
+              <h2>Paramètres de visualisation</h2>
+              <div class="filter-group">
+                <label for="metric" style="display:block; margin-bottom:8px; font-weight:600; font-size:0.9rem; color:#475569;">
+                    Choisir une donnée à analyser
+                </label>
+                <div class="styled-select-wrapper">
+                    <select id="metric">
+                      <option value="ratio">Mix Électrique Bas-Carbone</option>
+                      <option value="trade">Indépendance & Échanges</option>
+                      <option value="conso">Consommation par Habitant</option>
+                    </select>
+                </div>
+              </div>
+              <div class="slider-container">
+                <span style="font-weight:600; color:#475569; min-width: 60px;">Année : <span id="yearLabel" style="color:#0f172a;">2024</span></span>
+                <input id="year" type="range" min="1971" max="2024" step="1" value="2024" />
+              </div>
+              <div class="legend-container">
+                  <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.85rem; color:#475569;">Échelle de lecture</label>
+                  <div id="legendGradient" class="legend-gradient"></div>
+                  <div class="legend-labels"><span id="legendMin">Low</span><span id="legendMax">High</span></div>
+              </div>
+              <div id="metricInfoBox" class="info-box">
+                  <span class="info-title">Définition</span>
+                  <div id="infoContent" class="info-content">...</div>
+                  <div id="infoKey" class="info-reading-key">...</div>
+              </div>
+            </aside>
+          </div>
+          <div class="status" id="status" style="margin-top:10px; font-size:0.8rem; color:#94a3b8; text-align:right;">Chargement des données géographiques...</div>
+        </main>
+      </div>
+  </div>
+
+  <div id="view-grid-container" class="main-view-container hidden">
+    <div class="container">
+        <div class="view-header" style="margin-top: 20px;">
+            <h2 id="grid-title" class="view-title">Vue Mosaïque</h2>
+            <div id="grid-desc" class="view-desc">Description...</div>
+        </div>
+        <div class="grid-toolbar">
+            <div class="internal-view-switch">
+                <button id="btn-pie" class="view-btn active" onclick="switchGridView('pie')">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg> Mix
+                </button>
+                <button id="btn-curve" class="view-btn" onclick="switchGridView('curve')">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> Trajectoires
+                </button>
+            </div>
+            <div class="separator"></div>
+            <div class="internal-view-switch">
+                <button id="btn-flow-conso" class="view-btn active" onclick="switchGridFlow('conso')">Conso/Hab</button>
+                <button id="btn-flow-import" class="view-btn" onclick="switchGridFlow('import')">Imports</button>
+                <button id="btn-flow-export" class="view-btn" onclick="switchGridFlow('export')">Exports</button>
+            </div>
+            <div class="slider-container" id="grid-slider-wrapper">
+                <span style="font-weight:600; color:#475569;">Année : <span id="gridYearDisplay" style="color:#0f172a; min-width:45px; display:inline-block">2024</span></span>
+                <input type="range" id="yearSliderGrid" min="1971" max="2024" value="2024" step="1">
+            </div>
+            <div id="legend-content"></div>
+        </div>
+        <div id="charts-grid"></div>
+    </div>
+  </div>
+
+  <script src="./europe.js"></script>
+
+  <script>
+    // --- UI CONFIG CARTE ---
+    const METRIC_DEFINITIONS = {
+        ratio: {
+            definition: "Pourcentage de l'électricité produite à partir de sources n'émettant pas directement de CO₂ (Nucléaire + Énergies Renouvelables).",
+            readingKey: "🔴 Fossile (0%) \n 🟢 Décarboné (100%)",
+            gradient: "linear-gradient(90deg, #ef4444 0%, #f8fafc 50%, #22c55e 100%)", 
+            min: "0% (Polluant)", max: "100% (Propre)"
+        },
+        trade: {
+            definition: "Solde des échanges commerciaux d'énergie. Permet d'identifier si un pays produit plus qu'il ne consomme (Exportateur) ou s'il dépend de ses voisins (Importateur).",
+            readingKey: "🔴 Importateur (Dépendant) \n 🟢 Exportateur (Autonome)",
+            gradient: "linear-gradient(90deg, #ef4444 0%, #f8fafc 50%, #22c55e 100%)", 
+            min: "Importateur Net", max: "Exportateur Net"
+        },
+        conso: {
+            definition: "Quantité d'énergie primaire consommée par une personne moyenne. Cet indicateur reflète à la fois le niveau de vie, l'efficacité énergétique et le climat.",
+            readingKey: "⚪ Faible Conso. \n 🔵 Forte Conso.",
+            gradient: "linear-gradient(90deg, #f1f5f9 0%, #1e40af 100%)", 
+            min: "Sobre", max: "Intensif"
+        }
+    };
+
+    function updateMetricUI(metricKey) {
+        const info = METRIC_DEFINITIONS[metricKey];
+        if(!info) return;
+        document.getElementById('infoContent').innerText = info.definition;
+        document.getElementById('infoKey').innerText = info.readingKey;
+        document.getElementById('legendGradient').style.background = info.gradient;
+        document.getElementById('legendMin').innerText = info.min;
+        document.getElementById('legendMax').innerText = info.max;
+    }
+
+    const metricSelectEl = document.getElementById('metric');
+    metricSelectEl.addEventListener('change', (e) => { updateMetricUI(e.target.value); });
+    updateMetricUI(metricSelectEl.value);
+
+    // --- MAIN TOGGLE ---
+    function toggleMainView(view) {
+        const map = document.getElementById('view-map-container');
+        const grid = document.getElementById('view-grid-container');
+        document.getElementById('btn-show-map').className = view==='map'?'view-btn active':'view-btn';
+        document.getElementById('btn-show-grid').className = view==='grid'?'view-btn active':'view-btn';
+        if (view === 'map') { map.classList.remove('hidden'); grid.classList.add('hidden'); } 
+        else { map.classList.add('hidden'); grid.classList.remove('hidden'); if(loadedDataGrid.length>0) updateGridView(); }
+    }
+
+    // --- CONFIG GRID ---
+    const FLOW_SUPPLY = "Total energy supply (PJ)";
+    const FLOW_IMPORT = "Imports (PJ)";
+    const FLOW_EXPORT = "Exports (PJ)";
+
+    // Mapping pour navigation : Doit correspondre aux noms dans script.js (Production)
+    // Ici on normalise noms pour la navigation
+    const PROD_PAGE_NAMES = {
+        "Czech Republic": "Czechia", 
+        "Slovak Republic": "Slovakia", 
+        "Bosnia and Herzegovina": "Bosnia and Herzegovina", 
+        "North Macedonia": "North Macedonia", 
+        "Moldova": "Moldova", 
+        "Republic of Moldova": "Moldova"
+    };
+
+    let EUROPE_COUNTRIES = [ "Austria", "Belgium",  "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy",  "Latvia", "Lithuania", "Luxembourg",  "Netherlands",  "Norway", "Poland", "Portugal",  "Slovak Republic", "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine", "United Kingdom"];
+    const POP_COUNTRY_MAP = { "Czech Republic": "Czechia", "Slovak Republic": "Slovakia", "Bosnia and Herzegovina": "Bosnia and Herzegovina", "North Macedonia": "North Macedonia", "Moldova": "Moldova", "Republic of Moldova": "Moldova" };
+    const COUNTRY_TRANSLATIONS = { "Albania": "Albanie", "Austria": "Autriche", "Belgium": "Belgique", "Bosnia and Herzegovina": "Bosnie-Herzégovine", "Bulgaria": "Bulgarie", "Croatia": "Croatie", "Cyprus": "Chypre", "Czech Republic": "République Tchèque", "Denmark": "Danemark", "Estonia": "Estonie", "Finland": "Finlande", "France": "France", "Germany": "Allemagne", "Greece": "Grèce", "Hungary": "Hongrie", "Iceland": "Islande", "Ireland": "Irlande", "Italy": "Italie", "Kosovo": "Kosovo", "Latvia": "Lettonie", "Lithuania": "Lituanie", "Luxembourg": "Luxembourg", "Malta": "Malte", "Moldova": "Moldavie", "Montenegro": "Monténégro", "Netherlands": "Pays-Bas", "North Macedonia": "Macédoine du Nord", "Norway": "Norvège", "Poland": "Pologne", "Portugal": "Portugal", "Romania": "Roumanie", "Serbia": "Serbie", "Slovak Republic": "Slovaquie", "Slovenia": "Slovénie", "Spain": "Espagne", "Sweden": "Suède", "Switzerland": "Suisse", "Ukraine": "Ukraine", "United Kingdom": "Royaume-Uni" };
+
+    const CATEGORY_MAP = { 'Coal, peat and oil shale': 'Charbon', 'Crude, NGL and feedstocks': 'Pétrole', 'Oil products': 'Pétrole', 'Natural gas': 'Gaz', 'Nuclear': 'Nucléaire', 'Renewables and waste': 'Renouvelables', 'Hydro': 'Renouvelables', 'Geothermal': 'Renouvelables', 'Solar/wind/other': 'Renouvelables', 'Biofuels and waste': 'Renouvelables', 'Electricity': 'Électricité', 'Heat': 'Chaleur' };
+    const COLORS = { 'Charbon': '#991b1b', 'Pétrole': '#e63636', 'Gaz': '#f53a0b', 'Nucléaire': '#0e9240', 'Renouvelables': '#37db3f', 'Autre': '#94a3b8' };
+    const CURVE_COLORS = { 'Décarbonné (Nuc+Ren)': '#22c55e', 'Fossile (Gaz+Pét+Char)': '#ef4444' };
+    const CATEGORY_ORDER = ['Renouvelables', 'Nucléaire', 'Gaz', 'Pétrole', 'Charbon', 'Autre'];
+    const START_YEAR = 1971, END_YEAR = 2024;
+
+    let loadedDataGrid = [], popLookup = {};
+    let currentGridViewMode = 'pie', currentGridFlow = 'conso', currentGridYear = "2024", globalMaxY = 0; 
+    const tooltipGrid = d3.select("body").append("div").attr("id", "tooltip-grid").style("position", "absolute").style("z-index", "1000").style("visibility", "hidden").style("opacity", "0").style("background", "rgba(30, 41, 59, 0.95)").style("color", "white").style("padding", "8px 12px").style("border-radius", "6px").style("font-size", "0.9rem").style("pointer-events", "none").style("box-shadow", "0 2px 5px rgba(0,0,0,0.3)").style("transition", "opacity 0.2s");
+
+    Promise.all([ d3.csv("./data/TimeSeries.csv"), d3.csv("./data/population-with-un-projections.csv") ])
+    .then(([energyData, popData]) => {
+        loadedDataGrid = energyData; processPopulation(popData);
+        updateGridData(); 
+        updateTexts(); 
+        updateGridView();
+        document.getElementById("yearSliderGrid").addEventListener("input", function() {
+            currentGridYear = this.value; document.getElementById("gridYearDisplay").innerText = this.value;
+            if(currentGridViewMode === 'pie') drawGridPie();
+        });
+    }).catch(err => { console.error("Erreur chargement grid:", err); });
+
+    function switchGridView(view) {
+        currentGridViewMode = view;
+        document.getElementById('btn-pie').className = view === 'pie' ? 'view-btn active' : 'view-btn';
+        document.getElementById('btn-curve').className = view === 'curve' ? 'view-btn active' : 'view-btn';
+        const slider = document.getElementById('grid-slider-wrapper');
+        if(view === 'curve') slider.classList.add('hidden'); else slider.classList.remove('hidden');
+        updateTexts(); updateGridView();
+    }
+
+    function switchGridFlow(flow) {
+        currentGridFlow = flow;
+        document.getElementById('btn-flow-conso').className = flow === 'conso' ? 'view-btn active' : 'view-btn';
+        document.getElementById('btn-flow-import').className = flow === 'import' ? 'view-btn active' : 'view-btn';
+        document.getElementById('btn-flow-export').className = flow === 'export' ? 'view-btn active' : 'view-btn';
+        updateGridData(); updateTexts(); updateGridView();
+    }
+
+    function updateTexts() {
+        const titleEl = document.getElementById('grid-title');
+        const descEl = document.getElementById('grid-desc');
+        let flowLabel = "Consommation";
+        let unitText = "Gigajoules par habitant (GJ/hab)";
+        if (currentGridFlow !== 'conso') { flowLabel = currentGridFlow === 'import' ? "Importations" : "Exportations"; unitText = "Pétajoules (PJ) [Volume Total]"; }
+
+        if(currentGridViewMode === 'curve') {
+            titleEl.textContent = `Trajectoires Historiques : ${flowLabel}`;
+            if(currentGridFlow === 'conso') descEl.innerHTML = `Analyse diachronique (1971-2024) de l'<strong>${flowLabel.toLowerCase()}</strong> d'énergie. <br>L'unité normalisée <strong>(GJ/habitant)</strong> permet de comparer la dynamique des pays indépendamment de leur taille démographique.`;
+            else descEl.innerHTML = `Analyse diachronique (1971-2024) des <strong>${flowLabel.toLowerCase()}</strong> d'énergie. <br>L'unité en <strong>Pétajoules (PJ)</strong> permet de visualiser les volumes totaux échangés et d'identifier les acteurs majeurs du marché européen.`;
+        } else {
+            titleEl.textContent = `Structure : ${flowLabel}`;
+            if(currentGridFlow === 'conso') descEl.innerHTML = `Décomposition du mix de <strong>${flowLabel.toLowerCase()}</strong> pour l'année sélectionnée.<br>Les camemberts montrent la répartition par source (%). L'unité sous-jacente est normalisée par habitant pour la cohérence visuelle.`;
+            else descEl.innerHTML = `Décomposition du mix des <strong>${flowLabel.toLowerCase()}</strong> pour l'année sélectionnée.<br>Les camemberts montrent la répartition par source (%). Les volumes sont exprimés en valeur absolue (PJ).`;
+        }
+    }
+
+    function updateGridData() { calculateGlobalMax(); sortCountries(); }
+    function updateGridView() { drawGridLegend(); if (currentGridViewMode === 'pie') drawGridPie(); else drawGridCurves(); }
+    function getTargetFlow() { if (currentGridFlow === 'import') return FLOW_IMPORT; if (currentGridFlow === 'export') return FLOW_EXPORT; return FLOW_SUPPLY; }
+    function getUnitLabel() { return currentGridFlow === 'conso' ? 'GJ/hab' : 'PJ'; }
+
+    function drawGridLegend() {
+        const container = d3.select("#legend-content"); container.html(""); 
+        if(currentGridViewMode === 'pie') {
+            CATEGORY_ORDER.forEach(cat => { if(!COLORS[cat] || cat === 'Autre' || cat === 'Électricité' || cat === 'Chaleur') return; container.append("div").attr("class", "legend-item").html(`<div class="legend-color" style="background:${COLORS[cat]}"></div><span>${cat}</span>`); });
+        } else {
+            Object.entries(CURVE_COLORS).forEach(([label, color]) => { container.append("div").attr("class", "legend-item").html(`<div class="legend-color" style="background:${color}; height:3px; width:18px;"></div><span>${label}</span>`); });
+            container.append("div").attr("class", "legend-item").html(`<span style="font-style:italic; color:#64748b; font-size:0.8em; margin-left:10px;">(Échelle : ${getUnitLabel()})</span>`);
+        }
+    }
+
+    function processPopulation(popData) {
+        popLookup = {};
+        popData.forEach(row => {
+            let val = row["Population - Sex: all - Age: all - Variant: estimates"] || row["Population - Sex: all - Age: all - Variant: medium"];
+            if(val) { if(!popLookup[row.Entity]) popLookup[row.Entity] = {}; popLookup[row.Entity][row.Year] = parseFloat(val); }
+        });
+    }
+    
+    function sortCountries() {
+        const targetFlow = getTargetFlow();
+        const isPerCapita = currentGridFlow === 'conso';
+        const countriesWithScore = EUROPE_COUNTRIES.map(country => {
+            const popName = POP_COUNTRY_MAP[country] || country;
+            const rows = loadedDataGrid.filter(d => d.Country === country && d.Flow === targetFlow);
+            let sumScore = 0, count = 0;
+            for(let y = START_YEAR; y <= END_YEAR; y++) {
+                let yearStr = y.toString(), totalVal = 0;
+                rows.forEach(r => {
+                    if (r.Product === 'Total' || r.Product === 'Electricity' || r.Product === 'Heat') return;
+                    let v = parseFloat(r[yearStr] || r["2024 Provisional"]);
+                    if(targetFlow !== FLOW_SUPPLY) v = Math.abs(v); 
+                    if(!isNaN(v)) totalVal += v;
+                });
+                if(isPerCapita) { let pop = popLookup[popName] ? popLookup[popName][yearStr] : 0; if(totalVal > 0 && pop > 0) { sumScore += (totalVal / pop); count++; } }
+                else { if(totalVal > 0) { sumScore += totalVal; count++; } }
+            }
+            return { name: country, score: count > 0 ? (sumScore / count) : 0 };
+        });
+        countriesWithScore.sort((a, b) => b.score - a.score);
+        EUROPE_COUNTRIES = countriesWithScore.map(c => c.name);
+    }
+
+    function processDataCurves(allData, country) {
+        const targetFlow = getTargetFlow(), isPerCapita = currentGridFlow === 'conso', popName = POP_COUNTRY_MAP[country] || country, timeSeries = [];
+        const rows = allData.filter(d => d.Country === country && d.Flow === targetFlow);
+        for(let y = START_YEAR; y <= END_YEAR; y++) {
+            let yearStr = y.toString(), fossilSum = 0, lowCarbonSum = 0, hasData = false;
+            rows.forEach(r => {
+                if (r.Product === 'Total' || r.Product === 'Electricity' || r.Product === 'Heat') return;
+                let val = parseFloat(r[yearStr] || r["2024 Provisional"]);
+                if(targetFlow !== FLOW_SUPPLY) val = Math.abs(val);
+                if (!isNaN(val)) {
+                    hasData = true;
+                    const cat = CATEGORY_MAP[r.Product] || 'Autre';
+                    if (['Charbon', 'Pétrole', 'Gaz'].includes(cat)) fossilSum += val; else if (['Nucléaire', 'Renouvelables'].includes(cat)) lowCarbonSum += val;
+                }
+            });
+            let finalFossil = NaN, finalLowC = NaN, population = popLookup[popName] ? popLookup[popName][yearStr] : 0;
+            if (hasData) {
+                if(isPerCapita) { if(population > 0) { finalFossil = (fossilSum * 1000000) / population; finalLowC = (lowCarbonSum * 1000000) / population; } }
+                else { finalFossil = fossilSum; finalLowC = lowCarbonSum; }
+            }
+            timeSeries.push({ year: y, fossil: finalFossil, lowCarbon: finalLowC, pop: population });
+        }
+        return timeSeries;
+    }
+
+    function processDataPie(allData, country, year) {
+        const targetFlow = getTargetFlow();
+        let grouped = {}, total = 0;
+        const rows = allData.filter(d => d.Country === country && d.Flow === targetFlow);
+        rows.forEach(r => {
+            if (r.Product === 'Total' || r.Product === 'Electricity' || r.Product === 'Heat') return;
+            let val = parseFloat(r[year] || r["2024 Provisional"]);
+            if(targetFlow !== FLOW_SUPPLY) val = Math.abs(val);
+            if(isNaN(val) || val <= 0) return;
+            const cat = CATEGORY_MAP[r.Product] || 'Autre';
+            if(!grouped[cat]) grouped[cat] = 0; grouped[cat] += val; total += val;
+        });
+        let items = Object.entries(grouped).map(([key, value]) => ({key, value}));
+        items.sort((a, b) => { let iA = CATEGORY_ORDER.indexOf(a.key), iB = CATEGORY_ORDER.indexOf(b.key); return (iA===-1?999:iA) - (iB===-1?999:iB); });
+        return { items, total };
+    }
+
+    function calculateGlobalMax() {
+        let max = 0;
+        EUROPE_COUNTRIES.forEach(country => {
+            const data = processDataCurves(loadedDataGrid, country);
+            data.forEach(d => { if(!isNaN(d.fossil) && d.fossil > max) max = d.fossil; if(!isNaN(d.lowCarbon) && d.lowCarbon > max) max = d.lowCarbon; });
+        });
+        globalMaxY = max > 0 ? max * 1.1 : 100; 
+    }
+
+    const commonW = 240, commonH = 180;
+    function drawGridPie() {
+        const container = d3.select("#charts-grid"); container.html(""); 
+        const centerX = commonW / 2, centerY = commonH / 2, radius = 75;
+        const isPerCapita = currentGridFlow === 'conso';
+        EUROPE_COUNTRIES.forEach(country => {
+            const countryData = processDataPie(loadedDataGrid, country, currentGridYear);
+            const card = container.append("div").attr("class", "country-card ui-card");
+            
+            // NAVIGATION CLICK
+            card.on("click", () => {
+                const targetName = PROD_PAGE_NAMES[country] || country;
+                window.location.href = `../production/production.html?country=${encodeURIComponent(targetName)}`;
+            });
+
+            const frenchName = COUNTRY_TRANSLATIONS[country] || country;
+            card.append("div").attr("class", "country-title").attr("title", frenchName).text(frenchName);
+            if (countryData.total === 0) { card.append("div").style("height", "140px").style("display", "flex").style("align-items", "center").style("justify-content", "center").style("color", "#94a3b8").style("font-style", "italic").text("Pas de données"); } 
+            else {
+                const svg = card.append("svg").attr("class", "responsive-svg").attr("viewBox", `0 0 ${commonW} ${commonH}`).append("g").attr("transform", `translate(${centerX},${centerY})`);
+                const pie = d3.pie().value(d => d.value).sort(null);
+                const arc = d3.arc().innerRadius(0).outerRadius(radius);
+                const arcHover = d3.arc().innerRadius(0).outerRadius(radius + 8); 
+                svg.selectAll('path').data(pie(countryData.items)).enter().append('path').attr('d', arc).attr('fill', d => COLORS[d.data.key] || COLORS['Autre']).attr('stroke', 'white').style('stroke-width', '1px')
+                    .on("mouseover", function(event, d) {
+                        d3.select(this).transition().duration(200).attr('d', arcHover).style("opacity", "0.8");
+                        let subText = "";
+                        if(isPerCapita) {
+                            const popName = POP_COUNTRY_MAP[country] || country;
+                            const pop = popLookup[popName] ? popLookup[popName][currentGridYear] : 0;
+                            if(pop > 0) { const gj = Math.round((d.data.value * 1000000) / pop); subText = `<span style="font-size:0.85em; opacity:0.7"> (${gj} GJ/hab)</span>`; }
+                        }
+                        tooltipGrid.html(`<div style="font-weight:bold; margin-bottom:4px;">${d.data.key}</div><div>${Math.round(d.data.value)} PJ ${subText}</div><div style="font-size:0.8em; opacity:0.8; margin-top:2px;">(${Math.round((d.data.value/countryData.total)*100)}%)</div>`).style("visibility", "visible").style("opacity", "1");
+                    })
+                    .on("mousemove", e => tooltipGrid.style("left", (e.pageX+15)+"px").style("top", (e.pageY-15)+"px"))
+                    .on("mouseout", function() { d3.select(this).transition().duration(200).attr('d', arc).style("opacity", "1"); tooltipGrid.style("opacity", "0").style("visibility", "hidden"); });
+            }
+        });
+    }
+
+    function drawGridCurves() {
+        const container = d3.select("#charts-grid"); container.html(""); 
+        const margin = {top: 20, right: 10, bottom: 30, left: 45};
+        const innerW = commonW - margin.left - margin.right, innerH = commonH - margin.top - margin.bottom;
+        const x = d3.scaleLinear().domain([START_YEAR, END_YEAR]).range([0, innerW]);
+        const y = d3.scaleLinear().domain([0, globalMaxY]).range([innerH, 0]);
+        const lineGreen = d3.line().defined(d => !isNaN(d.lowCarbon)).x(d => x(d.year)).y(d => y(d.lowCarbon));
+        const lineRed = d3.line().defined(d => !isNaN(d.fossil)).x(d => x(d.year)).y(d => y(d.fossil));
+        const unitLabel = getUnitLabel();
+        const isPerCapita = currentGridFlow === 'conso';
+
+        EUROPE_COUNTRIES.forEach(country => {
+            const data = processDataCurves(loadedDataGrid, country);
+            const card = container.append("div").attr("class", "country-card ui-card");
+            
+            // NAVIGATION CLICK
+            card.on("click", () => {
+                const targetName = PROD_PAGE_NAMES[country] || country;
+                window.location.href = `../production/production.html?country=${encodeURIComponent(targetName)}`;
+            });
+
+            const frenchName = COUNTRY_TRANSLATIONS[country] || country;
+            card.append("div").attr("class", "country-title").attr("title", frenchName).text(frenchName);
+            const svg = card.append("svg").attr("class", "responsive-svg").attr("viewBox", `0 0 ${commonW} ${commonH}`).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+            svg.append("g").attr("transform", `translate(0,${innerH})`).attr("class", "axis").call(d3.axisBottom(x).tickValues([1971, 2000, 2024]).tickFormat(d3.format("d")));
+            svg.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(4).tickFormat(d => d >= 1000 ? d3.format(".1s")(d) : d));
+            svg.append("text").attr("x", -margin.left + 5).attr("y", -8).style("font-size", "10px").style("fill", "#64748b").text(unitLabel);
+            svg.append("path").datum(data).attr("fill", "none").attr("stroke", CURVE_COLORS['Décarbonné (Nuc+Ren)']).attr("stroke-width", 2).attr("d", lineGreen);
+            svg.append("path").datum(data).attr("fill", "none").attr("stroke", CURVE_COLORS['Fossile (Gaz+Pét+Char)']).attr("stroke-width", 2).attr("d", lineRed);
+            const hoverLine = svg.append("line").attr("class", "hover-line").attr("y1", 0).attr("y2", innerH);
+            svg.append("rect").attr("width", innerW).attr("height", innerH).style("fill", "transparent")
+                .on("mousemove", function(event) {
+                    const [mx] = d3.pointer(event);
+                    const year = Math.round(x.invert(mx));
+                    const d = data.find(item => item.year === year);
+                    hoverLine.attr("x1", x(year)).attr("x2", x(year)).style("opacity", 1);
+                    if(d && (!isNaN(d.fossil) || !isNaN(d.lowCarbon))) {
+                        let subTextFossil = "", subTextLowC = "";
+                        if(isPerCapita && d.pop > 0) {
+                            subTextFossil = `<span style="opacity:0.7; font-size:0.85em">(${Math.round((d.fossil*d.pop)/1000000)} PJ)</span>`;
+                            subTextLowC = `<span style="opacity:0.7; font-size:0.85em">(${Math.round((d.lowCarbon*d.pop)/1000000)} PJ)</span>`;
+                        }
+                        tooltipGrid.html(`<div style="font-weight:bold; margin-bottom:4px;">${year}</div><div style="color:${CURVE_COLORS['Fossile (Gaz+Pét+Char)']}">Fossile: ${Math.round(d.fossil)} ${unitLabel} ${subTextFossil}</div><div style="color:${CURVE_COLORS['Décarbonné (Nuc+Ren)']}">Décarb: ${Math.round(d.lowCarbon)} ${unitLabel} ${subTextLowC}</div>`)
+                            .style("visibility", "visible").style("opacity", "1").style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
+                    } else { tooltipGrid.style("opacity", "0"); hoverLine.style("opacity", 0); }
+                })
+                .on("mouseout", () => { tooltipGrid.style("opacity", "0").style("visibility", "hidden"); hoverLine.style("opacity", 0); });
+        });
+    }
+  </script>
+</body>
+</html>

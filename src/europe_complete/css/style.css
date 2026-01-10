@@ -1,0 +1,232 @@
+/*
+  Vue Europe
+  - S'appuie sur les variables éventuelles de ../css/global.css
+  - Layout : carte à gauche, panneau d'options à droite, slider en dessous
+*/
+
+/* --- Titres --- */
+.title {
+  text-align: center;
+  margin: 0.5rem 0 1rem;
+}
+
+/* --- Layout principal --- */
+.map-layout .content {
+  width: 100%;
+}
+
+.viz-row {
+  display: grid;
+  grid-template-columns: 1fr 320px; /* map + panneau */
+  gap: 16px;
+  align-items: start;
+}
+
+.controls {
+  background: var(--panel-bg, #fff);
+  border: 1px solid var(--border, #e6e6e6);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+@media (max-width: 980px) {
+  .viz-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Carte --- */
+.viz-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  background: #e9eef4; /* gris-bleu doux */
+  border: 1px solid var(--border, #e6e6e6);
+  border-radius: 12px;
+  overflow: visible; /* laisse la tooltip dépasser */
+}
+
+#map {
+  width: 100%;
+  height: 520px;
+  display: block;
+  cursor: grab; /* indique qu'on peut déplacer */
+}
+
+/* curseur pendant le drag (activé via JS) */
+.viz-wrap.is-dragging #map {
+  cursor: grabbing;
+}
+
+.country {
+  stroke: rgba(0, 0, 0, 0.55);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.country:hover {
+  stroke: rgba(0, 0, 0, 0.95);
+  stroke-width: 2.0;
+}
+
+/* --- Slider (périodes) --- */
+.year-bar {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e6e6e6);
+  border-radius: 12px;
+  background: var(--panel-bg, #fff);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.year-bar input[type="range"] {
+  width: 100%;
+}
+
+/* --- Légende --- */
+.legend {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border, #e6e6e6);
+  border-radius: 12px;
+  background: var(--panel-bg, #fff);
+  font-size: 0.95rem;
+}
+
+.legend-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-bar {
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.legend-minmax {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  color: var(--text-muted, #666);
+  font-size: 0.85rem;
+}
+
+/* --- Tooltip --- */
+.tooltip {
+  position: absolute;
+  z-index: 9999;
+  pointer-events: none;
+  background: rgba(20, 20, 20, 0.92);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  max-width: 260px;
+  line-height: 1.35;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* Petit hint "main" pour indiquer le déplacement */
+.pan-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  background: rgba(20, 20, 20, 0.75);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.pan-hint.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Texte d'aide / status --- */
+.hint {
+  margin-top: 1rem;
+  color: var(--text-muted, #666);
+  font-size: 0.9rem;
+}
+
+.status {
+  margin-top: 0.75rem;
+  color: var(--text-muted, #666);
+  text-align: center;
+}
+
+/* --- Marges page (si global.css ne le fait pas déjà) --- */
+header {
+  width: 100%;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.metric-desc {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e6e6e6);
+  border-radius: 12px;
+  background: var(--panel-bg, #fff);
+  color: var(--text, #222);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.metric-desc .muted {
+  color: var(--text-muted, #666);
+  font-size: 0.88rem;
+  margin-top: 8px;
+}
+
+.metric-desc .swatch {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  vertical-align: -1px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.15);
+  margin-right: 6px;
+}
+
+.metric-desc .hatch {
+  background: repeating-linear-gradient(
+    45deg,
+    #efefef,
+    #efefef 6px,
+    #c7c7c7 6px,
+    #c7c7c7 9px
+  );
+}
+
+.year-bar datalist {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding: 0 2px;
+}
+
+.year-bar datalist option {
+  font-size: 12px;
+  color: var(--text-muted, #666);
+}
