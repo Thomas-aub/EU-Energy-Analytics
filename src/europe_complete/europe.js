@@ -189,28 +189,19 @@ function setupMap() {
       hideTooltip();
       d3.select(event.currentTarget).attr("stroke", "#fff").attr("stroke-width", 0.5);
     })
-    // --- NOUVEAU : CLICK EVENT ---
-    // ... (dans setupMap, à la suite des events mouseover/mouseout)
 
     .on("click", (event, d) => {
       const iso = d.properties.ISO3; // ex: "TUR"
 
-      // 1. On cherche le nom EXACT attendu par la page production.html
-      // On utilise ISO_TO_PROD_NAME car il contient "Republic of Turkiye"
-      let targetName = ISO_TO_PROD_NAME[iso];
+      let targetName = ISO_TO_FR[iso];
 
-      // 2. Filet de sécurité : Si le pays n'est pas dans votre liste manuelle
-      // on essaie de prendre le nom par défaut du fichier GeoJSON (souvent en anglais)
       if (!targetName && d.properties.NAME) {
         targetName = d.properties.NAME;
       }
 
-      // 3. Redirection sécurisée
       if (targetName) {
-        // On encode l'URL pour gérer les espaces (Republic%20of...)
         window.location.href = `../production/production.html?country=${encodeURIComponent(targetName)}`;
       } else {
-        // Cas très rare où le pays n'a pas de nom (évite le lien vide)
         console.warn("Impossible de rediriger : Nom introuvable pour le code ISO", iso);
       }
     });
