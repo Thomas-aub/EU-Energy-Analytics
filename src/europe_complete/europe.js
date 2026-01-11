@@ -192,7 +192,7 @@ function setupMap() {
     // --- NOUVEAU : CLICK EVENT ---
     .on("click", (event, d) => {
         const iso = d.properties.ISO3;
-        const targetName = ISO_TO_PROD_NAME[iso];
+        const targetName = ISO_TO_FR[iso];
         if (targetName) {
             // Redirection vers la page Production avec le paramètre
             window.location.href = `../production/production.html?country=${encodeURIComponent(targetName)}`;

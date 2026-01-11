@@ -89,6 +89,7 @@ async function start() {
         // Gestion de l'URL pour la sélection automatique
         const urlParams = new URLSearchParams(window.location.search);
         const countryParam = urlParams.get('country');
+        
         if (countryParam && EUROPE_COUNTRIES.includes(countryParam)) {
             d3.select("#countrySelect").property("value", countryParam);
         }
@@ -167,13 +168,10 @@ function toggleAll() {
     updateChart();
 }
 
-// --- NOUVELLE FONCTION POUR LES STATS ---
 function calculateAndRenderStats(countryData) {
-    // 1. Trouver la dernière année complète disponible pour ce pays
     const latestYearObj = d3.max(countryData, d => d.date);
     const latestYear = latestYearObj.getFullYear();
     
-    // Filtrer les données pour cette année
     const yearData = countryData.filter(d => d.date.getFullYear() === latestYear);
     
     const totalProd = d3.sum(yearData, d => d.value);
