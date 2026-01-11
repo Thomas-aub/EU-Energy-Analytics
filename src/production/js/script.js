@@ -118,6 +118,7 @@ async function start() {
         d3.select("#loader").style("display", "none");
         
         populateCountries();
+        d3.select("#countrySelect").property("value", "France");
 
         // Gestion de l'URL pour la sélection automatique
         const urlParams = new URLSearchParams(window.location.search);
