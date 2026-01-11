@@ -14,7 +14,7 @@ const TRANSLATIONS = {
     "Wind": "Éolien", "Hydro": "Hydraulique", "Oil": "Pétrole", "Bioenergy": "Bioénergie",
     "Other Renewables Excluding Bioenergy": "Autres renouvelables",
     
- 
+    // Pays
     "Albania": "Albanie",
     "Austria": "Autriche", 
     "Belgium": "Belgique", 
@@ -118,15 +118,30 @@ async function start() {
         d3.select("#loader").style("display", "none");
         
         populateCountries();
-        d3.select("#countrySelect").property("value", "France");
 
-        // Gestion de l'URL pour la sélection automatique
+
         const urlParams = new URLSearchParams(window.location.search);
-        const countryParam = urlParams.get('country');
+        let param = urlParams.get('country'); 
         
-        if (countryParam && EUROPE_COUNTRIES.includes(countryParam)) {
-            d3.select("#countrySelect").property("value", countryParam);
+        let initialCountry = "France";
+
+        if (param) {
+            if (EUROPE_COUNTRIES.includes(param)) {
+                initialCountry = param;
+            }
+
+            else {
+                const enName = Object.keys(TRANSLATIONS).find(key => TRANSLATIONS[key] === param);
+                
+                if (enName && EUROPE_COUNTRIES.includes(enName)) {
+                    initialCountry = enName;
+                }
+            }
         }
+
+        // 3. On applique la valeur finale au selecteur
+        d3.select("#countrySelect").property("value", initialCountry);
+        // ---------------------------------------------------------
 
         d3.select("#selectAllBtn").on("click", () => {
             userHasManuallyChanged = true;
@@ -392,4 +407,4 @@ function showTooltip(event, key, points, color) {
     }
 }
 
-start();
+start();    
