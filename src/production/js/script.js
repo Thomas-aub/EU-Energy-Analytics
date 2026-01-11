@@ -1,9 +1,11 @@
 const EUROPE_COUNTRIES = [
-    "Austria", "Belgium", "Czechia", "Denmark", "Estonia", "Finland",
-    "France", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy",
-    "Latvia", "Lithuania", "Luxembourg", "Netherlands", "Norway", "Poland",
-    "Portugal","Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
-    "Turkey", "United Kingdom"
+    "Albania", "Austria", "Belgium", "Bosnia and Herzegovina", "Bulgaria", 
+    "Croatia", "Cyprus", "Czechia", "Denmark", "Estonia", "Finland", 
+    "France", "Germany", "Greece", "Hungary", "Iceland", "Ireland", 
+    "Italy", "Kosovo", "Latvia", "Lithuania", "Luxembourg", "Malta", 
+    "Moldova", "Montenegro", "Netherlands", "North Macedonia", "Norway", 
+    "Poland", "Portugal", "Romania", "Serbia", "Slovakia", "Slovenia", 
+    "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom"
 ];
 
 const TRANSLATIONS = {
@@ -12,16 +14,47 @@ const TRANSLATIONS = {
     "Wind": "Éolien", "Hydro": "Hydraulique", "Oil": "Pétrole", "Bioenergy": "Bioénergie",
     "Other Renewables Excluding Bioenergy": "Autres renouvelables",
     
-    // Pays
-    "Austria": "Autriche", "Belgium": "Belgique", "Czechia": "Tchéquie", 
-    "Denmark": "Danemark", "Estonia": "Estonie", "Finland": "Finlande",
-    "France": "France", "Germany": "Allemagne", "Greece": "Grèce", 
-    "Hungary": "Hongrie", "Iceland": "Islande", "Ireland": "Irlande", 
-    "Italy": "Italie", "Latvia": "Lettonie", "Lithuania": "Lituanie", 
-    "Luxembourg": "Luxembourg", "Netherlands": "Pays-Bas", "Norway": "Norvège", 
-    "Poland": "Pologne", "Portugal": "Portugal","Romania":"Roumanie", "Slovakia": "Slovaquie", 
-    "Slovenia": "Slovénie", "Spain": "Espagne", "Sweden": "Suède", 
-    "Switzerland": "Suisse", "Turkey": "Turquie", "United Kingdom": "Royaume-Uni"
+ 
+    "Albania": "Albanie",
+    "Austria": "Autriche", 
+    "Belgium": "Belgique", 
+    "Bosnia and Herzegovina": "Bosnie-Herzégovine",
+    "Bulgaria": "Bulgarie",
+    "Croatia": "Croatie",
+    "Cyprus": "Chypre",
+    "Czechia": "Tchéquie", 
+    "Denmark": "Danemark", 
+    "Estonia": "Estonie", 
+    "Finland": "Finlande",
+    "France": "France", 
+    "Germany": "Allemagne", 
+    "Greece": "Grèce", 
+    "Hungary": "Hongrie", 
+    "Iceland": "Islande", 
+    "Ireland": "Irlande", 
+    "Italy": "Italie", 
+    "Kosovo": "Kosovo",
+    "Latvia": "Lettonie", 
+    "Lithuania": "Lituanie", 
+    "Luxembourg": "Luxembourg", 
+    "Malta": "Malte",
+    "Moldova": "Moldavie",
+    "Montenegro": "Monténégro",
+    "Netherlands": "Pays-Bas", 
+    "North Macedonia": "Macédoine du Nord",
+    "Norway": "Norvège", 
+    "Poland": "Pologne", 
+    "Portugal": "Portugal",
+    "Romania": "Roumanie", 
+    "Serbia": "Serbie",
+    "Slovakia": "Slovaquie", 
+    "Slovenia": "Slovénie", 
+    "Spain": "Espagne", 
+    "Sweden": "Suède", 
+    "Switzerland": "Suisse", 
+    "Turkey": "Turquie", 
+    "Ukraine": "Ukraine",
+    "United Kingdom": "Royaume-Uni"
 };
 
 const EMISSION_FACTORS = {
