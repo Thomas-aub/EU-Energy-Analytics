@@ -2,7 +2,7 @@ const EUROPE_COUNTRIES = [
     "Austria", "Belgium", "Czechia", "Denmark", "Estonia", "Finland",
     "France", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy",
     "Latvia", "Lithuania", "Luxembourg", "Netherlands", "Norway", "Poland",
-    "Portugal", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
+    "Portugal","Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
     "Turkey", "United Kingdom"
 ];
 
@@ -19,7 +19,7 @@ const TRANSLATIONS = {
     "Hungary": "Hongrie", "Iceland": "Islande", "Ireland": "Irlande", 
     "Italy": "Italie", "Latvia": "Lettonie", "Lithuania": "Lituanie", 
     "Luxembourg": "Luxembourg", "Netherlands": "Pays-Bas", "Norway": "Norvège", 
-    "Poland": "Pologne", "Portugal": "Portugal", "Slovakia": "Slovaquie", 
+    "Poland": "Pologne", "Portugal": "Portugal","Romania":"Roumanie", "Slovakia": "Slovaquie", 
     "Slovenia": "Slovénie", "Spain": "Espagne", "Sweden": "Suède", 
     "Switzerland": "Suisse", "Turkey": "Turquie", "United Kingdom": "Royaume-Uni"
 };
