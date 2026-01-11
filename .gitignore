@@ -1,4 +1,3 @@
-data/
 *.sublime-workspace
 .DS_Store
 dist/
