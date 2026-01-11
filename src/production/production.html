@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorez l'Électricité Européenne</title>
+    <title>Production Électrique - Détail par Pays</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="./css/style.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -16,8 +16,8 @@
         <nav class="main-nav">
             <ul>
                 <li><a href="../index.html">Accueil</a></li>
+                <li><a href="../europe_complete/europe_complete.html">Carte & Données</a></li>
                 <li><a href="production.html" class="active">Production</a></li>
-                <li><a href="../europe_complete/europe_complete.html">Carte et données</a></li>
             </ul>
         </nav>
     </header>
@@ -30,29 +30,46 @@
             </div>
 
             <div class="filter-group">
-                <label>Energy Sources</label>
+                <label>Sources d'énergie</label>
                 <div id="source-checklist" class="checklist"></div>
-                <button id="selectAllBtn" class="btn">Toggle All</button>
+                <button id="selectAllBtn">Tout cocher / décocher</button>
             </div>
 
-            <div id="finalConsumptionContainer"
-                style="display:none; align-items: center; gap: 8px; white-space: nowrap;">
-                <input type="checkbox" id="finalConsumptionChk" style="margin: 0; cursor: pointer;">
-                <label for="finalConsumptionChk"
-                    style="cursor: pointer; font-weight: bold; margin: 0; display: inline-block;">
-                    Afficher la production totale
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 20px;">
+                <input type="checkbox" id="finalConsumptionChk" style="cursor: pointer;">
+                <label for="finalConsumptionChk" style="cursor: pointer; margin: 0;">
+                    Afficher le Total
                 </label>
             </div>
         </aside>
 
         <main class="content">
-            <h2 id="chartTitle" style="text-align: center;"></h2>
+            <div class="stats-grid">
+                <div class="stat-card border-green">
+                    <h4>Part Décarbonée</h4>
+                    <div class="stat-value" id="stat-carbon-free">-</div>
+                    <div class="stat-sub" id="stat-carbon-free-sub">en 2023</div>
+                </div>
+                
+                <div class="stat-card border-purple">
+                    <h4>Intensité Carbone</h4>
+                    <div class="stat-value" id="stat-intensity">-</div>
+                    <div class="stat-sub" id="stat-top-source-sub"></div>
+                </div>
+
+                <div class="stat-card border-blue">
+                    <h4>Source Principale</h4>
+                    <div class="stat-value" id="stat-top-source" style="font-size: 1.5rem;">-</div>
+                    <div class="stat-sub" id="stat-top-share">-</div>
+                </div>
+            </div>
+
+            <h2 id="chartTitle"></h2>
             <div id="chart"></div>
-            <div id="loader" class="status">Loading CSV data...</div>
+            <div id="loader">Chargement des données...</div>
         </main>
     </div>
 
     <script src="./js/script.js"></script>
 </body>
-
 </html>

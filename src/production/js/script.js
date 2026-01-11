@@ -11,18 +11,28 @@ const TRANSLATIONS = {
     "Nuclear": "Nucléaire", "Gas": "Gaz", "Coal": "Charbon", "Solar": "Solaire",
     "Wind": "Éolien", "Hydro": "Hydraulique", "Oil": "Pétrole", "Bioenergy": "Bioénergie",
     "Other Renewables Excluding Bioenergy": "Autres renouvelables",
-
+    
     // Pays
-    "Austria": "Autriche", "Belgium": "Belgique", "Czechia": "Tchéquie",
+    "Austria": "Autriche", "Belgium": "Belgique", "Czechia": "Tchéquie", 
     "Denmark": "Danemark", "Estonia": "Estonie", "Finland": "Finlande",
-    "France": "France", "Germany": "Allemagne", "Greece": "Grèce",
-    "Hungary": "Hongrie", "Iceland": "Islande", "Ireland": "Irlande",
-    "Italy": "Italie", "Latvia": "Lettonie", "Lithuania": "Lituanie",
-    "Luxembourg": "Luxembourg", "Netherlands": "Pays-Bas", "Norway": "Norvège",
-    "Poland": "Pologne", "Portugal": "Portugal", "Slovakia": "Slovaquie",
-    "Slovenia": "Slovénie", "Spain": "Espagne", "Sweden": "Suède",
+    "France": "France", "Germany": "Allemagne", "Greece": "Grèce", 
+    "Hungary": "Hongrie", "Iceland": "Islande", "Ireland": "Irlande", 
+    "Italy": "Italie", "Latvia": "Lettonie", "Lithuania": "Lituanie", 
+    "Luxembourg": "Luxembourg", "Netherlands": "Pays-Bas", "Norway": "Norvège", 
+    "Poland": "Pologne", "Portugal": "Portugal", "Slovakia": "Slovaquie", 
+    "Slovenia": "Slovénie", "Spain": "Espagne", "Sweden": "Suède", 
     "Switzerland": "Suisse", "Turkey": "Turquie", "United Kingdom": "Royaume-Uni"
 };
+
+const EMISSION_FACTORS = {
+    "Charbon": 820, "Gaz": 490, "Pétrole": 650,
+    "Nucléaire": 12, "Éolien": 11, "Solaire": 45, 
+    "Hydraulique": 24, "Bioénergie": 230, "Autres renouvelables": 38
+};
+
+const LOW_CARBON_SOURCES = [
+    "Nucléaire", "Éolien", "Solaire", "Hydraulique", "Bioénergie", "Autres renouvelables"
+];
 
 const t = (word) => TRANSLATIONS[word] || word;
 
@@ -38,9 +48,8 @@ async function start() {
         const rawText = await response.text();
         const rawData = d3.csvParse(rawText);
         const parseDate = d3.timeParse("%Y");
-        d3.select("#finalConsumptionContainer").style("display", "flex");
 
-        const sourceColumns = rawData.columns.filter(c =>
+        const sourceColumns = rawData.columns.filter(c => 
             !["Entity", "Code", "Year"].includes(c)
         );
 
@@ -51,10 +60,10 @@ async function start() {
 
             sourceColumns.forEach(col => {
                 let cleanName = col.replace("Electricity from ", "")
-                    .replace(" - TWh (adapted for visualization of chart electricity-prod-source-stacked)", "")
-                    .replace(" - TWh", "")
-                    .trim()
-                    .replace(/\b\w/g, c => c.toUpperCase());
+                                   .replace(" - TWh (adapted for visualization of chart electricity-prod-source-stacked)", "")
+                                   .replace(" - TWh", "")
+                                   .trim()
+                                   .replace(/\b\w/g, c => c.toUpperCase());
 
                 let translatedName = t(cleanName);
 
@@ -74,32 +83,28 @@ async function start() {
         colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(allUniqueProducts);
 
         d3.select("#loader").style("display", "none");
-        d3.select("#finalConsumptionContainer").style("display", "block");
-
+        
         populateCountries();
 
-        // --- DEBUT MODIFICATION URL ---
-        // Récupération du paramètre 'country' dans l'URL
+        // Gestion de l'URL pour la sélection automatique
         const urlParams = new URLSearchParams(window.location.search);
         const countryParam = urlParams.get('country');
-
-        // Si le paramètre existe et qu'il est valide (présent dans EUROPE_COUNTRIES), on change la sélection
         if (countryParam && EUROPE_COUNTRIES.includes(countryParam)) {
             d3.select("#countrySelect").property("value", countryParam);
         }
-        // --- FIN MODIFICATION URL ---
 
         d3.select("#selectAllBtn").on("click", () => {
             userHasManuallyChanged = true;
             toggleAll();
         });
-
+        
         d3.select("#countrySelect").on("change", render);
         d3.select("#finalConsumptionChk").on("change", updateChart);
 
         render();
     } catch (err) {
         d3.select("#loader").text("Erreur : " + err.message);
+        console.error(err);
     }
 }
 
@@ -113,8 +118,9 @@ function populateCountries() {
 function render() {
     const country = d3.select("#countrySelect").property("value");
     const countryData = globalData.filter(d => d.country === country);
-
+    
     const availableProducts = [...new Set(countryData.filter(d => d.value > 0).map(d => d.product))];
+    
     availableProducts.sort((a, b) => {
         const sumA = d3.sum(countryData.filter(d => d.product === a), d => d.value);
         const sumB = d3.sum(countryData.filter(d => d.product === b), d => d.value);
@@ -123,16 +129,17 @@ function render() {
 
     let toCheck;
     if (!userHasManuallyChanged) {
-        toCheck = availableProducts.slice(0, 3);
+        toCheck = availableProducts.slice(0, 3); 
     } else {
         toCheck = [];
-        d3.selectAll("#source-checklist input:checked").each(function () {
+        d3.selectAll("#source-checklist input:checked").each(function() {
             toCheck.push(this.value);
         });
     }
-
+    
     updateChecklistUI(availableProducts, toCheck);
     updateChart();
+    calculateAndRenderStats(countryData); 
 }
 
 function updateChecklistUI(products, checkedList) {
@@ -145,7 +152,7 @@ function updateChecklistUI(products, checkedList) {
             .attr("type", "checkbox")
             .attr("value", p)
             .property("checked", checkedList.includes(p))
-            .on("change", function () {
+            .on("change", function() {
                 userHasManuallyChanged = true;
                 updateChart();
             });
@@ -155,17 +162,60 @@ function updateChecklistUI(products, checkedList) {
 
 function toggleAll() {
     const checkboxes = d3.selectAll("#source-checklist input");
-    const anyUnchecked = checkboxes.filter(function () { return !this.checked; }).size() > 0;
+    const anyUnchecked = checkboxes.filter(function() { return !this.checked; }).size() > 0;
     checkboxes.property("checked", anyUnchecked);
     updateChart();
+}
+
+// --- NOUVELLE FONCTION POUR LES STATS ---
+function calculateAndRenderStats(countryData) {
+    // 1. Trouver la dernière année complète disponible pour ce pays
+    const latestYearObj = d3.max(countryData, d => d.date);
+    const latestYear = latestYearObj.getFullYear();
+    
+    // Filtrer les données pour cette année
+    const yearData = countryData.filter(d => d.date.getFullYear() === latestYear);
+    
+    const totalProd = d3.sum(yearData, d => d.value);
+    
+    // A. Calcul Part Décarbonée
+    const lowCarbonProd = d3.sum(yearData, d => 
+        LOW_CARBON_SOURCES.includes(d.product) ? d.value : 0
+    );
+    const lowCarbonShare = totalProd > 0 ? (lowCarbonProd / totalProd) * 100 : 0;
+    
+    let totalEmissions = 0;
+    yearData.forEach(d => {
+        const factor = EMISSION_FACTORS[d.product] || 0;
+        totalEmissions += d.value * factor;
+    });
+    const carbonIntensity = totalProd > 0 ? Math.round(totalEmissions / totalProd) : 0;
+
+    const topSourceObj = yearData.sort((a, b) => b.value - a.value)[0];
+    const topSourceName = topSourceObj ? topSourceObj.product : "-";
+    const topSourceShare = (topSourceObj && totalProd > 0) 
+        ? Math.round((topSourceObj.value / totalProd) * 100) 
+        : 0;
+
+    d3.select("#stat-carbon-free").text(Math.round(lowCarbonShare) + "%");
+    d3.select("#stat-carbon-free-sub").text(`de la production en ${latestYear}`);
+    
+    d3.select("#stat-intensity").text(carbonIntensity);
+    if(carbonIntensity < 50) d3.select("#stat-intensity").style("color", "#10b981"); // Vert
+    else if(carbonIntensity < 200) d3.select("#stat-intensity").style("color", "#f59e0b"); // Orange
+    else d3.select("#stat-intensity").style("color", "#ef4444"); // Rouge
+
+    d3.select("#stat-top-source").text(topSourceName);
+    d3.select("#stat-top-source-sub").text(`gCO₂eq / kWh en ${latestYear}`);
+    d3.select("#stat-top-share").text(`${topSourceShare}% du mix total en ${latestYear}`);
 }
 
 function updateChart() {
     const country = d3.select("#countrySelect").property("value");
     const isTotalEnabled = d3.select("#finalConsumptionChk").property("checked");
-
+    
     let selectedSources = [];
-    d3.selectAll("#source-checklist input:checked").each(function () { selectedSources.push(this.value); });
+    d3.selectAll("#source-checklist input:checked").each(function() { selectedSources.push(this.value); });
 
     if (selectedSources.length === 0 && userHasManuallyChanged) {
         userHasManuallyChanged = false;
@@ -175,30 +225,24 @@ function updateChart() {
 
     d3.select("#chartTitle").text(`Production d'électricité (TWh) - ${t(country)}`);
 
-    // On récupère TOUTES les sources du pays pour calculer le vrai total
     const allCountryData = globalData.filter(d => d.country === country);
-
     const groupedByDate = d3.groups(allCountryData, d => d.date.getTime());
-
+    
     const chartData = groupedByDate.map(([time, entries]) => {
         const row = { date: new Date(time) };
-
-        // 1. Calcul du total réel (somme de TOUTES les sources du pays)
         let realTotal = d3.sum(entries, d => d.value);
         if (isTotalEnabled) row["Total"] = realTotal;
 
-        // 2. Ajout des valeurs seulement pour les sources sélectionnées par l'utilisateur
         entries.forEach(e => {
             if (selectedSources.includes(e.product)) {
                 row[e.product] = e.value;
             }
         });
-
         return row;
     }).sort((a, b) => a.date - b.date);
 
     const activeKeys = isTotalEnabled ? ["Total", ...selectedSources] : selectedSources;
-
+    
     let yMax = 0;
     if (chartData.length > 0) {
         yMax = d3.max(chartData, d => {
@@ -225,9 +269,8 @@ function drawLineChart(data, keys, yMax) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-
     x = d3.scaleTime()
-        .domain(d3.extent(data, d => d.date)) 
+        .domain(d3.extent(data, d => d.date))
         .range([0, width]);
 
     y = d3.scaleLinear().domain([0, yMax * 1.1]).nice().range([height, 0]);
@@ -248,18 +291,18 @@ function drawLineChart(data, keys, yMax) {
             .attr("fill", color)
             .attr("fill-opacity", isTotal ? 0 : 0.1)
             .attr("d", d3.area().x(d => x(d.date)).y0(y(0)).y1(d => y(d.value)).curve(d3.curveMonotoneX))
-            .on("mouseover", function () {
+            .on("mouseover", function() { 
                 hoverLine.style("display", "block");
-                if (!isTotal) d3.select(this).attr("fill-opacity", 0.3);
+                if(!isTotal) d3.select(this).attr("fill-opacity", 0.3); 
             })
-            .on("mousemove", function (event) {
+            .on("mousemove", function(event) {
                 const [mouseX] = d3.pointer(event);
                 hoverLine.attr("x1", mouseX).attr("x2", mouseX);
                 showTooltip(event, key, points, color);
             })
-            .on("mouseleave", function () {
+            .on("mouseleave", function() {
                 hoverLine.style("display", "none");
-                if (!isTotal) d3.select(this).attr("fill-opacity", 0.1);
+                if(!isTotal) d3.select(this).attr("fill-opacity", 0.1);
                 tooltip.style("display", "none");
             });
 
@@ -273,7 +316,10 @@ function drawLineChart(data, keys, yMax) {
             .style("pointer-events", "none");
     });
 
-    svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(width / 80).tickFormat(d3.timeFormat("%Y")));
+        
     svg.append("g").call(d3.axisLeft(y));
 
     const legend = svg.append("g").attr("transform", `translate(${width + 20}, 0)`);
@@ -287,13 +333,13 @@ function drawLineChart(data, keys, yMax) {
 function showTooltip(event, key, points, color) {
     const [mouseX] = d3.pointer(event);
     const xDate = x.invert(mouseX);
-
+    
     const bisect = d3.bisector(d => d.date).left;
     const i = bisect(points, xDate, 1);
-
+    
     const d0 = points[i - 1];
     const d1 = points[i];
-
+    
     let d = d0;
     if (d1 && d0) {
         d = (xDate - d0.date > d1.date - xDate) ? d1 : d0;
@@ -302,7 +348,7 @@ function showTooltip(event, key, points, color) {
     }
 
     if (d) {
-        const label = key === "Total" ? "Production Totale (Toutes sources)" : key;
+        const label = key === "Total" ? "Production Totale" : key;
         tooltip.style("display", "block")
             .style("left", (event.pageX + 15) + "px")
             .style("top", (event.pageY - 35) + "px")
