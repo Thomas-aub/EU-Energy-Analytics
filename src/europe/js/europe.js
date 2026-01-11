@@ -1,7 +1,7 @@
 // =======================
 // Paths
 // =======================
-const GEO_PATH = "./data/europe.geojson";
+const GEO_PATH = "https://raw.githubusercontent.com/leakyMirror/map-of-europe/master/GeoJSON/europe.geojson";
 const PROD_PATH = "./data/electricity-prod-source-stacked.csv";
 const TRADE_PATH = "./data/energy-imports-and-exports-energy-use.csv";
 const CONSO_PATH = "./data/primary-energy-cons.csv";

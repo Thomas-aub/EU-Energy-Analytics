@@ -1,7 +1,7 @@
 // =======================
 // Paths
 // =======================
-const GEO_PATH = "./data/europe.geojson";
+const GEO_PATH = "https://raw.githubusercontent.com/leakyMirror/map-of-europe/master/GeoJSON/europe.geojson";
 const TIMESERIES_PATH = "./data/TimeSeries.csv";
 const POP_PATH = "./data/population-with-un-projections.csv";
 
