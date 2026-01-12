@@ -68,6 +68,7 @@ Les données utilisées proviennent d'organismes de référence et ont été tra
 
 * **Tech Stack:** Native HTML/CSS and D3.js (v7).
 
+---
 
 ### 🛠️ Installation et Lancement local
 
