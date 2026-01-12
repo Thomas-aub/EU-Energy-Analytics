@@ -30,7 +30,7 @@ const METRIC_DEFINITIONS = {
         definition: "Solde import/export (% production).", 
         readingKey: "🔴 Importateur ↔ 🟢 Exportateur", 
         gradient: "linear-gradient(90deg, #dc2626 , #ffffff, #16a34a)", 
-        min: "Export", max: "Import"},
+        min: "Import", max: "Export"},
     conso: { definition: "Conso primaire par habitant.", readingKey: "⚪ Faible ↔ 🔵 Forte", gradient: "linear-gradient(90deg, #f1f5f9, #1e40af)", min: "Faible", max: "Forte" }
 };
 
