@@ -28,8 +28,8 @@ const METRIC_DEFINITIONS = {
     ratio: { definition: "Part d'électricité décarbonée (Nucléaire + EnR).", readingKey: "🔴 Fossile ↔ 🟢 Décarboné", gradient: "linear-gradient(90deg, #ef4444, #eab308, #22c55e)", min: "0%", max: "100%" },
     trade: { 
         definition: "Solde import/export (% production).", 
-        readingKey: "🟢 Exportateur ↔ 🔴 Importateur", 
-        gradient: "linear-gradient(90deg, #16a34a, #ffffff, #dc2626)", 
+        readingKey: "🔴 Importateur ↔ 🟢 Exportateur", 
+        gradient: "linear-gradient(90deg, #dc2626 , #ffffff, #16a34a)", 
         min: "Export", max: "Import"},
     conso: { definition: "Conso primaire par habitant.", readingKey: "⚪ Faible ↔ 🔵 Forte", gradient: "linear-gradient(90deg, #f1f5f9, #1e40af)", min: "Faible", max: "Forte" }
 };
