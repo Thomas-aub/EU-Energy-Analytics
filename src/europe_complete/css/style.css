@@ -1,13 +1,24 @@
 /*
-  Vue Europe
-  - S'appuie sur les variables éventuelles de ../css/global.css
-  - Layout : carte à gauche, panneau d'options à droite, slider en dessous
+  Vue Europe - Styles spécifiques
 */
 
-/* --- Titres --- */
+/* --- Titres et Textes --- */
 .title {
   text-align: center;
   margin: 0.5rem 0 1rem;
+}
+
+.hint {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.status {
+  margin-top: 0.75rem;
+  color: #64748b;
+  text-align: right;
+  font-size: 0.8rem;
 }
 
 /* --- Layout principal --- */
@@ -17,216 +28,305 @@
 
 .viz-row {
   display: grid;
-  grid-template-columns: 1fr 320px; /* map + panneau */
-  gap: 16px;
+  grid-template-columns: 1fr 320px; /* Carte à gauche, Contrôles à droite */
+  gap: 20px;
   align-items: start;
 }
 
-.controls {
-  background: var(--panel-bg, #fff);
-  border: 1px solid var(--border, #e6e6e6);
-  border-radius: 12px;
-  padding: 12px;
-}
-
+/* Adaptation Mobile */
 @media (max-width: 980px) {
   .viz-row {
     grid-template-columns: 1fr;
   }
 }
 
-/* --- Carte --- */
+/* --- Conteneur de la Carte --- */
 .viz-wrap {
   position: relative;
   width: 100%;
-  min-height: 520px;
-  background: #e9eef4; /* gris-bleu doux */
-  border: 1px solid var(--border, #e6e6e6);
+  height: 650px;
+  min-height: 600px;
+  background-color: #cbd5e1; /* Fond bleu océan par défaut (important si le JS met du temps) */
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  overflow: visible; /* laisse la tooltip dépasser */
+  /* IMPORTANT : visible pour que le tooltip ne soit pas coupé s'il dépasse un peu, 
+     mais attention le JS gère le tooltip sur le body maintenant */
+  overflow: hidden; 
 }
 
 #map {
   width: 100%;
-  height: 520px;
+  height: 100%;
   display: block;
-  cursor: grab; /* indique qu'on peut déplacer */
+  cursor: grab;
 }
 
-/* curseur pendant le drag (activé via JS) */
 .viz-wrap.is-dragging #map {
   cursor: grabbing;
 }
 
-.country {
-  stroke: rgba(0, 0, 0, 0.55);
-  stroke-width: 1.2;
-  vector-effect: non-scaling-stroke;
+/* Styles des pays (SVG) */
+path {
+  transition: fill 0.2s ease, stroke 0.2s ease;
 }
 
-.country:hover {
-  stroke: rgba(0, 0, 0, 0.95);
-  stroke-width: 2.0;
-}
-
-/* --- Slider (périodes) --- */
-.year-bar {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--border, #e6e6e6);
+/* --- Panneau de Contrôles --- */
+.map-controls-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  background: var(--panel-bg, #fff);
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 15px;
 }
 
-.year-bar input[type="range"] {
+.map-controls-card h2 {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #0f172a;
+  font-weight: 700;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+/* --- Inputs & Selects --- */
+.styled-select-wrapper {
+  position: relative;
+}
+
+select#metric {
   width: 100%;
-}
-
-/* --- Légende --- */
-.legend {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border: 1px solid var(--border, #e6e6e6);
-  border-radius: 12px;
-  background: var(--panel-bg, #fff);
-  font-size: 0.95rem;
-}
-
-.legend-title {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #fff;
+  color: #334155;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.2s;
 }
 
-.legend-row {
+select#metric:hover {
+  border-color: #94a3b8;
+}
+
+.styled-select-wrapper::after {
+  content: "▼";
+  font-size: 0.7rem;
+  color: #64748b;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.slider-container {
+  background: #f8fafc;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
+  margin-top: 5px;
 }
 
-.legend-bar {
-  flex: 1;
-  height: 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.legend-minmax {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.35rem;
-  color: var(--text-muted, #666);
-  font-size: 0.85rem;
-}
-
-/* --- Tooltip --- */
-.tooltip {
-  position: absolute;
-  z-index: 9999;
-  pointer-events: none;
-  background: rgba(20, 20, 20, 0.92);
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 10px;
-  font-size: 12px;
-  max-width: 260px;
-  line-height: 1.35;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-}
-
-/* Petit hint "main" pour indiquer le déplacement */
-.pan-hint {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  background: rgba(20, 20, 20, 0.75);
-  color: #fff;
-  padding: 6px 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 1;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-
-.pan-hint.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* --- Texte d'aide / status --- */
-.hint {
-  margin-top: 1rem;
-  color: var(--text-muted, #666);
-  font-size: 0.9rem;
-}
-
-.status {
-  margin-top: 0.75rem;
-  color: var(--text-muted, #666);
-  text-align: center;
-}
-
-/* --- Marges page (si global.css ne le fait pas déjà) --- */
-header {
+input[type="range"] {
+  cursor: pointer;
   width: 100%;
 }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px;
-  box-sizing: border-box;
+/* --- Légende et Info Box --- */
+.legend-container {
+  margin-top: 5px;
 }
 
-.metric-desc {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--border, #e6e6e6);
-  border-radius: 12px;
-  background: var(--panel-bg, #fff);
-  color: var(--text, #222);
-  font-size: 0.92rem;
-  line-height: 1.35;
+.legend-gradient {
+  height: 12px;
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background: #ccc; /* fallback */
 }
 
-.metric-desc .muted {
-  color: var(--text-muted, #666);
-  font-size: 0.88rem;
-  margin-top: 8px;
-}
-
-.metric-desc .swatch {
-  display: inline-block;
-  width: 14px;
-  height: 10px;
-  vertical-align: -1px;
-  border-radius: 3px;
-  border: 1px solid rgba(0,0,0,0.15);
-  margin-right: 6px;
-}
-
-.metric-desc .hatch {
-  background: repeating-linear-gradient(
-    45deg,
-    #efefef,
-    #efefef 6px,
-    #c7c7c7 6px,
-    #c7c7c7 9px
-  );
-}
-
-.year-bar datalist {
+.legend-labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 6px;
-  padding: 0 2px;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
 }
 
-.year-bar datalist option {
-  font-size: 12px;
-  color: var(--text-muted, #666);
+.info-box {
+  background-color: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  border-radius: 4px 8px 8px 4px;
+  padding: 16px;
+  margin-top: 10px;
+}
+
+.info-title {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.info-content {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.info-reading-key {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+  background: #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* --- Tooltip (Fixé sur le body) --- */
+.tooltip {
+    position: absolute;       
+    z-index: 9999;           
+    background: rgba(15, 23, 42, 0.95); 
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    pointer-events: none; /* La souris passe au travers */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    display: none;           
+    transform: translate(0, -50%); /* Centrage vertical par rapport au curseur */
+}
+
+/* --- Styles pour la Mosaïque (Grid) --- */
+.grid-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 30px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.internal-view-switch {
+  display: flex;
+  background: #fff;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.separator {
+  width: 1px;
+  height: 30px;
+  background: #cbd5e1;
+  margin: 0 5px;
+}
+
+#charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
+  width: 100%;
+  padding-bottom: 50px;
+}
+
+.country-card {
+  background: white;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.country-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #94a3b8;
+}
+
+.country-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #334155;
+}
+
+.responsive-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+#legend-content {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: #475569;
+  margin-top: 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+/* Utilitaires */
+.icon-svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.hover-line {
+  stroke: #64748b;
+  stroke-width: 1px;
+  stroke-dasharray: 4 4;
+  opacity: 0;
+  pointer-events: none;
 }

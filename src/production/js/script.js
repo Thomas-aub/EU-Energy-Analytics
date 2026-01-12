@@ -1,10 +1,11 @@
 const EUROPE_COUNTRIES = [
-    "Albania", "Austria", "Belgium", "Bosnia and Herzegovina", "Bulgaria", 
-    "Croatia", "Cyprus", "Czechia", "Denmark", "Estonia", "Finland", 
-    "France", "Germany", "Greece", "Hungary", "Iceland", "Ireland", 
-    "Italy", "Kosovo", "Latvia", "Lithuania", "Luxembourg", "Malta", 
-    "Moldova", "Montenegro", "Netherlands", "North Macedonia", "Norway", 
-    "Poland", "Portugal", "Romania", "Serbia", "Slovakia", "Slovenia", 
+    "Albania", "Armenia", "Austria", "Azerbaijan", "Belarus", "Belgium", 
+    "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czechia", 
+    "Denmark", "Estonia", "Faroe Islands", "Finland", "France", "Georgia", 
+    "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Israel", "Italy", 
+    "Latvia", "Lithuania", "Luxembourg", "Malta", "Moldova", 
+    "Montenegro", "Netherlands", "North Macedonia", "Norway", "Poland", 
+    "Portugal", "Romania", "Russia", "Serbia", "Slovakia", "Slovenia", 
     "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom"
 ];
 
@@ -15,46 +16,18 @@ const TRANSLATIONS = {
     "Other Renewables Excluding Bioenergy": "Autres renouvelables",
     
     // Pays
-    "Albania": "Albanie",
-    "Austria": "Autriche", 
-    "Belgium": "Belgique", 
-    "Bosnia and Herzegovina": "Bosnie-Herzégovine",
-    "Bulgaria": "Bulgarie",
-    "Croatia": "Croatie",
-    "Cyprus": "Chypre",
-    "Czechia": "Tchéquie", 
-    "Denmark": "Danemark", 
-    "Estonia": "Estonie", 
-    "Finland": "Finlande",
-    "France": "France", 
-    "Germany": "Allemagne", 
-    "Greece": "Grèce", 
-    "Hungary": "Hongrie", 
-    "Iceland": "Islande", 
-    "Ireland": "Irlande", 
-    "Italy": "Italie", 
-    "Kosovo": "Kosovo",
-    "Latvia": "Lettonie", 
-    "Lithuania": "Lituanie", 
-    "Luxembourg": "Luxembourg", 
-    "Malta": "Malte",
-    "Moldova": "Moldavie",
-    "Montenegro": "Monténégro",
-    "Netherlands": "Pays-Bas", 
-    "North Macedonia": "Macédoine du Nord",
-    "Norway": "Norvège", 
-    "Poland": "Pologne", 
-    "Portugal": "Portugal",
-    "Romania": "Roumanie", 
-    "Serbia": "Serbie",
-    "Slovakia": "Slovaquie", 
-    "Slovenia": "Slovénie", 
-    "Spain": "Espagne", 
-    "Sweden": "Suède", 
-    "Switzerland": "Suisse", 
-    "Turkey": "Turquie", 
-    "Ukraine": "Ukraine",
-    "United Kingdom": "Royaume-Uni"
+    "Albania": "Albanie", "Armenia": "Arménie", "Austria": "Autriche", "Azerbaijan": "Azerbaïdjan",
+    "Belarus": "Biélorussie", "Belgium": "Belgique", "Bosnia and Herzegovina": "Bosnie-Herzégovine",
+    "Bulgaria": "Bulgarie", "Croatia": "Croatie", "Cyprus": "Chypre", "Czechia": "Tchéquie", 
+    "Denmark": "Danemark", "Estonia": "Estonie", "Faroe Islands": "Îles Féroé", "Finland": "Finlande",
+    "France": "France", "Georgia": "Géorgie", "Germany": "Allemagne", "Greece": "Grèce", 
+    "Hungary": "Hongrie", "Iceland": "Islande", "Ireland": "Irlande", "Israel": "Israël",
+    "Italy": "Italie", "Latvia": "Lettonie", "Lithuania": "Lituanie", "Luxembourg": "Luxembourg", 
+    "Malta": "Malte", "Moldova": "Moldavie", "Montenegro": "Monténégro", "Netherlands": "Pays-Bas", 
+    "North Macedonia": "Macédoine du Nord", "Norway": "Norvège", "Poland": "Pologne", 
+    "Portugal": "Portugal", "Romania": "Roumanie", "Russia": "Russie", "Serbia": "Serbie",
+    "Slovakia": "Slovaquie", "Slovenia": "Slovénie", "Spain": "Espagne", "Sweden": "Suède", 
+    "Switzerland": "Suisse", "Turkey": "Turquie", "Ukraine": "Ukraine", "United Kingdom": "Royaume-Uni"
 };
 
 const EMISSION_FACTORS = {
@@ -72,6 +45,7 @@ const t = (word) => TRANSLATIONS[word] || word;
 let x, y;
 const tooltip = d3.select("body").append("div").attr("id", "tooltip");
 let globalData = [];
+let currentCountryData = []; // Nouvelle variable globale pour stocker les données du pays actif
 let colorScale;
 let userHasManuallyChanged = false;
 
@@ -119,29 +93,23 @@ async function start() {
         
         populateCountries();
 
-
         const urlParams = new URLSearchParams(window.location.search);
         let param = urlParams.get('country'); 
-        
         let initialCountry = "France";
 
         if (param) {
             if (EUROPE_COUNTRIES.includes(param)) {
                 initialCountry = param;
             }
-
             else {
                 const enName = Object.keys(TRANSLATIONS).find(key => TRANSLATIONS[key] === param);
-                
                 if (enName && EUROPE_COUNTRIES.includes(enName)) {
                     initialCountry = enName;
                 }
             }
         }
 
-        // 3. On applique la valeur finale au selecteur
         d3.select("#countrySelect").property("value", initialCountry);
-        // ---------------------------------------------------------
 
         d3.select("#selectAllBtn").on("click", () => {
             userHasManuallyChanged = true;
@@ -167,13 +135,14 @@ function populateCountries() {
 
 function render() {
     const country = d3.select("#countrySelect").property("value");
-    const countryData = globalData.filter(d => d.country === country);
+    // Mise à jour de la variable globale
+    currentCountryData = globalData.filter(d => d.country === country);
     
-    const availableProducts = [...new Set(countryData.filter(d => d.value > 0).map(d => d.product))];
+    const availableProducts = [...new Set(currentCountryData.filter(d => d.value > 0).map(d => d.product))];
     
     availableProducts.sort((a, b) => {
-        const sumA = d3.sum(countryData.filter(d => d.product === a), d => d.value);
-        const sumB = d3.sum(countryData.filter(d => d.product === b), d => d.value);
+        const sumA = d3.sum(currentCountryData.filter(d => d.product === a), d => d.value);
+        const sumB = d3.sum(currentCountryData.filter(d => d.product === b), d => d.value);
         return sumB - sumA;
     });
 
@@ -189,7 +158,8 @@ function render() {
     
     updateChecklistUI(availableProducts, toCheck);
     updateChart();
-    calculateAndRenderStats(countryData); 
+    // Appel initial avec les données par défaut (dernière année)
+    calculateAndRenderStats(); 
 }
 
 function updateChecklistUI(products, checkedList) {
@@ -217,11 +187,26 @@ function toggleAll() {
     updateChart();
 }
 
-function calculateAndRenderStats(countryData) {
-    const latestYearObj = d3.max(countryData, d => d.date);
-    const latestYear = latestYearObj.getFullYear();
+/**
+ * Calcule et affiche les statistiques (décarboné, intensité, source principale).
+ * @param {number|null} specificYear - Si fourni, utilise cette année. Sinon, utilise la dernière année disponible.
+ */
+function calculateAndRenderStats(specificYear = null) {
+    // Si currentCountryData est vide (ex: chargement), on sort
+    if (!currentCountryData || currentCountryData.length === 0) return;
+
+    let targetYear;
+
+    if (specificYear) {
+        targetYear = specificYear;
+    } else {
+        // Par défaut : la dernière année disponible
+        const latestYearObj = d3.max(currentCountryData, d => d.date);
+        targetYear = latestYearObj.getFullYear();
+    }
     
-    const yearData = countryData.filter(d => d.date.getFullYear() === latestYear);
+    // Filtrer les données pour l'année cible
+    const yearData = currentCountryData.filter(d => d.date.getFullYear() === targetYear);
     
     const totalProd = d3.sum(yearData, d => d.value);
     
@@ -231,6 +216,7 @@ function calculateAndRenderStats(countryData) {
     );
     const lowCarbonShare = totalProd > 0 ? (lowCarbonProd / totalProd) * 100 : 0;
     
+    // B. Intensité Carbone
     let totalEmissions = 0;
     yearData.forEach(d => {
         const factor = EMISSION_FACTORS[d.product] || 0;
@@ -238,14 +224,16 @@ function calculateAndRenderStats(countryData) {
     });
     const carbonIntensity = totalProd > 0 ? Math.round(totalEmissions / totalProd) : 0;
 
+    // C. Source Principale
     const topSourceObj = yearData.sort((a, b) => b.value - a.value)[0];
     const topSourceName = topSourceObj ? topSourceObj.product : "-";
     const topSourceShare = (topSourceObj && totalProd > 0) 
         ? Math.round((topSourceObj.value / totalProd) * 100) 
         : 0;
 
+    // Mise à jour du DOM
     d3.select("#stat-carbon-free").text(Math.round(lowCarbonShare) + "%");
-    d3.select("#stat-carbon-free-sub").text(`de la production en ${latestYear}`);
+    d3.select("#stat-carbon-free-sub").text(`de la production en ${targetYear}`);
     
     d3.select("#stat-intensity").text(carbonIntensity);
     if(carbonIntensity < 50) d3.select("#stat-intensity").style("color", "#10b981"); // Vert
@@ -253,8 +241,9 @@ function calculateAndRenderStats(countryData) {
     else d3.select("#stat-intensity").style("color", "#ef4444"); // Rouge
 
     d3.select("#stat-top-source").text(topSourceName);
-    d3.select("#stat-top-source-sub").text(`gCO₂eq / kWh en ${latestYear}`);
-    d3.select("#stat-top-share").text(`${topSourceShare}% du mix total en ${latestYear}`);
+    d3.select("#stat-top-source-sub")
+    .html(`gCO₂eq / kWh en ${targetYear} <br> <span style="font-size: 1em; opacity: 0.7; color: #db6060ff;">Cible Paris 2030 : 135-140 gCO₂eq / kWh</span>`);
+    d3.select("#stat-top-share").text(`${topSourceShare}% du mix total en ${targetYear}`);
 }
 
 function updateChart() {
@@ -272,8 +261,8 @@ function updateChart() {
 
     d3.select("#chartTitle").text(`Production d'électricité (TWh) - ${t(country)}`);
 
-    const allCountryData = globalData.filter(d => d.country === country);
-    const groupedByDate = d3.groups(allCountryData, d => d.date.getTime());
+    // On utilise la variable globale currentCountryData pour éviter de refiltrer
+    const groupedByDate = d3.groups(currentCountryData, d => d.date.getTime());
     
     const chartData = groupedByDate.map(([time, entries]) => {
         const row = { date: new Date(time) };
@@ -327,31 +316,43 @@ function drawLineChart(data, keys, yMax) {
         .style("stroke", "#4e4a4aff").style("stroke-width", "2px").style("stroke-dasharray", "4,4")
         .style("display", "none").style("pointer-events", "none");
 
+    // Ajout d'un rectangle transparent pour capter le mouseleave sur toute la zone
+    // Cela assure que si on sort par le haut ou le bas, les stats se réinitialisent
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mousemove", function(event) {
+            // Logique de curseur et mise à jour tooltip
+            const [mouseX] = d3.pointer(event);
+            hoverLine.attr("x1", mouseX).attr("x2", mouseX);
+            hoverLine.style("display", "block");
+            
+            // Mise à jour des stats dynamiques
+            const xDate = x.invert(mouseX);
+            // On trouve l'année la plus proche dans les données
+            const year = xDate.getFullYear();
+            calculateAndRenderStats(year);
+        })
+        .on("mouseleave", function() {
+            hoverLine.style("display", "none");
+            tooltip.style("display", "none");
+            // Retour à l'année par défaut (dernière année)
+            calculateAndRenderStats(null);
+        });
+
     keys.forEach(key => {
         const points = data.map(d => ({ date: d.date, value: d[key] || 0 }));
         const isTotal = key === "Total";
         const color = isTotal ? "#333" : colorScale(key);
-        const g = svg.append("g");
+        const g = svg.append("g").style("pointer-events", "none"); // Les paths ne doivent pas bloquer le rect de fond
 
         g.append("path")
             .datum(points)
             .attr("fill", color)
             .attr("fill-opacity", isTotal ? 0 : 0.1)
-            .attr("d", d3.area().x(d => x(d.date)).y0(y(0)).y1(d => y(d.value)).curve(d3.curveMonotoneX))
-            .on("mouseover", function() { 
-                hoverLine.style("display", "block");
-                if(!isTotal) d3.select(this).attr("fill-opacity", 0.3); 
-            })
-            .on("mousemove", function(event) {
-                const [mouseX] = d3.pointer(event);
-                hoverLine.attr("x1", mouseX).attr("x2", mouseX);
-                showTooltip(event, key, points, color);
-            })
-            .on("mouseleave", function() {
-                hoverLine.style("display", "none");
-                if(!isTotal) d3.select(this).attr("fill-opacity", 0.1);
-                tooltip.style("display", "none");
-            });
+            .attr("d", d3.area().x(d => x(d.date)).y0(y(0)).y1(d => y(d.value)).curve(d3.curveMonotoneX));
 
         g.append("path")
             .datum(points)
@@ -359,8 +360,85 @@ function drawLineChart(data, keys, yMax) {
             .attr("stroke", color)
             .attr("stroke-width", isTotal ? 3 : 2)
             .attr("stroke-dasharray", isTotal ? "6,4" : "0")
-            .attr("d", d3.line().x(d => x(d.date)).y(d => y(d.value)).curve(d3.curveMonotoneX))
-            .style("pointer-events", "none");
+            .attr("d", d3.line().x(d => x(d.date)).y(d => y(d.value)).curve(d3.curveMonotoneX));
+    });
+
+    // Ajout d'une couche spécifique pour le tooltip individuel
+    // Nous devons ré-implémenter la détection de la série la plus proche si vous voulez le tooltip spécifique au point
+    // Cependant, avec le changement demandé, il est souvent plus propre d'avoir un tooltip global par année ou de garder le tooltip au survol via le rect global.
+    
+    // Pour garder le comportement exact du tooltip par série tout en ayant les stats globales par année :
+    // On doit attacher les écouteurs sur le rect global pour l'année, ET calculer le point le plus proche pour le tooltip.
+    
+    const overlay = svg.select("rect");
+    overlay.on("mousemove", function(event) {
+        const [mouseX, mouseY] = d3.pointer(event);
+        hoverLine.attr("x1", mouseX).attr("x2", mouseX);
+        hoverLine.style("display", "block");
+
+        const xDate = x.invert(mouseX);
+        const year = xDate.getFullYear();
+        
+        // 1. Mise à jour des "Cards" en haut
+        calculateAndRenderStats(year);
+
+        // 2. Gestion du Tooltip "Flottant" (trouver la courbe la plus proche)
+        // On cherche le point le plus proche en X
+        // Puis parmi ces points, celui le plus proche en Y de la souris
+        
+        // Simplification : on trouve l'index temporel
+        // Comme les données sont triées par date et uniformes pour toutes les clés
+        // On prend le premier jeu de données (ex: première clé) pour trouver l'index
+        if (keys.length > 0) {
+            // On reconstruit un tableau temporaire pour le bisector
+            const samplePoints = data.map(d => ({ date: d.date }));
+            const bisect = d3.bisector(d => d.date).left;
+            const i = bisect(samplePoints, xDate, 1);
+            const d0 = samplePoints[i - 1];
+            const d1 = samplePoints[i];
+            
+            // Index exact dans le tableau data
+            let index = i; 
+            if (d0 && d1) {
+                index = (xDate - d0.date > d1.date - xDate) ? i : i - 1;
+            } else if (!d1) {
+                index = i - 1;
+            }
+
+            const d = data[index]; // Les données pour cette année là
+
+            if (d) {
+                // Trouver la clé dont la valeur Y est la plus proche de la souris
+                const yValueMouse = y.invert(mouseY);
+                
+                let closestKey = null;
+                let minDiff = Infinity;
+
+                keys.forEach(key => {
+                    const val = d[key] || 0;
+                    const diff = Math.abs(val - yValueMouse);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestKey = key;
+                    }
+                });
+
+                if (closestKey) {
+                    const color = closestKey === "Total" ? "#333" : colorScale(closestKey);
+                    const label = closestKey === "Total" ? "Production Totale" : closestKey;
+                    const val = d[closestKey] || 0;
+
+                    tooltip.style("display", "block")
+                        .style("left", (event.pageX + 15) + "px")
+                        .style("top", (event.pageY - 35) + "px")
+                        .html(`<div style="border-left: 4px solid ${color}; background: white; padding: 8px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <strong style="color: ${color}">${label}</strong><br>
+                            Année : ${d.date.getFullYear()}<br>
+                            <strong>${val.toFixed(2)} TWh</strong>
+                        </div>`);
+                }
+            }
+        }
     });
 
     svg.append("g")
@@ -377,34 +455,4 @@ function drawLineChart(data, keys, yMax) {
     });
 }
 
-function showTooltip(event, key, points, color) {
-    const [mouseX] = d3.pointer(event);
-    const xDate = x.invert(mouseX);
-    
-    const bisect = d3.bisector(d => d.date).left;
-    const i = bisect(points, xDate, 1);
-    
-    const d0 = points[i - 1];
-    const d1 = points[i];
-    
-    let d = d0;
-    if (d1 && d0) {
-        d = (xDate - d0.date > d1.date - xDate) ? d1 : d0;
-    } else if (d1) {
-        d = d1;
-    }
-
-    if (d) {
-        const label = key === "Total" ? "Production Totale" : key;
-        tooltip.style("display", "block")
-            .style("left", (event.pageX + 15) + "px")
-            .style("top", (event.pageY - 35) + "px")
-            .html(`<div style="border-left: 4px solid ${color}; background: white; padding: 8px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <strong style="color: ${color}">${label}</strong><br>
-                Année : ${d.date.getFullYear()}<br>
-                <strong>${d.value.toFixed(2)} TWh</strong>
-            </div>`);
-    }
-}
-
-start();    
+start();
