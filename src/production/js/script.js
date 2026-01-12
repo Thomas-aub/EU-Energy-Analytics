@@ -3,7 +3,7 @@ const EUROPE_COUNTRIES = [
     "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czechia", 
     "Denmark", "Estonia", "Faroe Islands", "Finland", "France", "Georgia", 
     "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Israel", "Italy", 
-    "Kosovo", "Latvia", "Lithuania", "Luxembourg", "Malta", "Moldova", 
+    "Latvia", "Lithuania", "Luxembourg", "Malta", "Moldova", 
     "Montenegro", "Netherlands", "North Macedonia", "Norway", "Poland", 
     "Portugal", "Romania", "Russia", "Serbia", "Slovakia", "Slovenia", 
     "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom"
@@ -40,7 +40,6 @@ const TRANSLATIONS = {
     "Ireland": "Irlande", 
     "Israel": "Israël",
     "Italy": "Italie", 
-    "Kosovo": "Kosovo",
     "Latvia": "Lettonie", 
     "Lithuania": "Lituanie", 
     "Luxembourg": "Luxembourg", 
