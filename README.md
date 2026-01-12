@@ -7,7 +7,7 @@
   </a>
 </div>
 
-##### [🌐 Accéder à la visualisation en ligne](https://thomas-aub.github.io/EU-Energy-Analytics)
+#### [🌐 Accéder à la visualisation en ligne](https://thomas-aub.github.io/EU-Energy-Analytics)
 
 **EU Energy Analytics** est une plateforme de visualisation de données interactive conçue pour explorer et comprendre les dynamiques énergétiques en Europe. Face à la double crise climatique et énergétique, ce projet permet de dépasser les idées reçues en offrant une vue claire sur la production d'électricité, l'indépendance énergétique et la transition écologique des pays de l'Union.
 
