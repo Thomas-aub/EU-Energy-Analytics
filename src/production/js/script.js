@@ -241,7 +241,8 @@ function calculateAndRenderStats(specificYear = null) {
     else d3.select("#stat-intensity").style("color", "#ef4444"); // Rouge
 
     d3.select("#stat-top-source").text(topSourceName);
-    d3.select("#stat-top-source-sub").text(`gCO₂eq / kWh en ${targetYear}`);
+    d3.select("#stat-top-source-sub")
+    .html(`gCO₂eq / kWh en ${targetYear} <br> <span style="font-size: 1em; opacity: 0.7; color: #db6060ff;">Cible Paris 2030 : 135-140 gCO₂eq / kWh</span>`);
     d3.select("#stat-top-share").text(`${topSourceShare}% du mix total en ${targetYear}`);
 }
 

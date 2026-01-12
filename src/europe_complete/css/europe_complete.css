@@ -265,6 +265,14 @@ select#metric:hover {
     gap: 20px;
     align-items: center;
     margin-bottom: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .internal-view-switch {

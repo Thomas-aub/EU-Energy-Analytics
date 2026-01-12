@@ -23,15 +23,28 @@ window.ISO_TO_FR = {
 };
 
 // UI CONFIG
-// Gradient Trade inversé : Rouge (Import) -> Vert (Export)
 const METRIC_DEFINITIONS = {
-    ratio: { definition: "Part d'électricité décarbonée (Nucléaire + EnR).", readingKey: "🔴 Fossile ↔ 🟢 Décarboné", gradient: "linear-gradient(90deg, #ef4444, #eab308, #22c55e)", min: "0%", max: "100%" },
+    ratio: { 
+        definition: "Part de la production n'émettant pas de CO₂ direct.<br>Regroupe le <b>Nucléaire</b> et les <b>Renouvelables</b>.", 
+        readingKey: "🔴 Majoritairement Fossile<br>🟢 Majoritairement Bas-Carbone", 
+        gradient: "linear-gradient(90deg, #ef4444, #eab308, #22c55e)", 
+        min: "0 %", 
+        max: "100 %" 
+    },
     trade: { 
-        definition: "Solde import/export (% production).", 
-        readingKey: "🔴 Importateur ↔ 🟢 Exportateur", 
-        gradient: "linear-gradient(90deg, #dc2626 , #ffffff, #16a34a)", 
-        min: "Import", max: "Export"},
-    conso: { definition: "Conso primaire par habitant.", readingKey: "⚪ Faible ↔ 🔵 Forte", gradient: "linear-gradient(90deg, #f1f5f9, #1e40af)", min: "Faible", max: "Forte" }
+        definition: "Solde des échanges commerciaux (% de la production).<br>Indique si le pays <b>dépend</b> de ses voisins.", 
+        readingKey: "🟢 Exportateur (Souverain)<br>🔴 Importateur (Dépendant)", 
+        gradient: "linear-gradient(90deg, #16a34a , #ffffff, #dc2626)", 
+        min: "Export", 
+        max: "Import"
+    },
+    conso: { 
+        definition: "Énergie consommée en moyenne par habitant.<br>Reflète le <b>niveau de vie</b> et l'<b>efficacité</b>.", 
+        readingKey: "⚪ Sobriété<br>🔵 Forte Intensité", 
+        gradient: "linear-gradient(90deg, #f1f5f9, #1e40af)", 
+        min: "Faible", 
+        max: "Forte" 
+    }
 };
 
 // VARIABLES GLOBALES
@@ -49,45 +62,66 @@ const metricSelect = d3.select("#metric");
 const yearSlider = d3.select("#year");
 const yearLabel = d3.select("#yearLabel");
 
-// --- CORRECTION : Création du Tooltip avec styles forcés ---
-// On supprime l'ancien s'il existe pour éviter les doublons
-d3.select("#tooltip-map").remove();
-
 const tooltip = d3.select("body").append("div")
     .attr("id", "tooltip-map")
     .style("position", "absolute")
-    .style("z-index", "10000")        /* Toujours au-dessus */
-    .style("visibility", "hidden")    /* Caché par défaut */
+    .style("z-index", "10000")
+    .style("visibility", "hidden")
     .style("background", "rgba(15, 23, 42, 0.95)")
     .style("color", "white")
     .style("padding", "8px 12px")
     .style("border-radius", "6px")
     .style("font-size", "0.9rem")
-    .style("pointer-events", "none")  /* La souris passe au travers */
+    .style("pointer-events", "none")
     .style("box-shadow", "0 4px 6px rgba(0,0,0,0.3)")
     .style("white-space", "nowrap");
-// Définitions D3 (Projection en haut pour éviter ReferenceError)
+
 const projection = d3.geoMercator();
 const path = d3.geoPath(projection);
 
-// Helpers
 const keyOf = (iso3, year) => `${iso3}_${year}`;
 const getIso3 = (feature) => feature?.properties?.ISO3;
 function triStartYearFromMin(year, minYear) { return year - ((year - minYear) % 3); }
 
 // =======================
-// PARSER
+// PARSER MODIFIÉ
 // =======================
 function parseProdRow(d) {
     const year = +d.Year;
     const iso3 = d.Code;
     if (!iso3 || isNaN(year)) return null;
-    const getVal = (k) => { const key = Object.keys(d).find(c => c.toLowerCase().includes(k.toLowerCase())); return key ? (+d[key] || 0) : 0; };
-    const lowCarbon = getVal("from nuclear") + getVal("from wind") + getVal("from solar") + getVal("from hydro") + getVal("from bioenergy") + getVal("other renewables");
-    const fossil = getVal("from coal") + getVal("from gas") + getVal("from oil");
+    
+    const getVal = (k) => { 
+        const key = Object.keys(d).find(c => c.toLowerCase().includes(k.toLowerCase())); 
+        return key ? (+d[key] || 0) : 0; 
+    };
+
+    // Extraction détaillée des 5 catégories
+    const nuclear = getVal("from nuclear");
+    const oil = getVal("from oil");
+    const gas = getVal("from gas");
+    const coal = getVal("from coal");
+    
+    // Agrégation des renouvelables
+    const wind = getVal("from wind");
+    const solar = getVal("from solar");
+    const hydro = getVal("from hydro");
+    const bio = getVal("from bioenergy");
+    const other = getVal("other renewables");
+    const renewables = wind + solar + hydro + bio + other;
+
+    // Calculs agrégés pour la carte (ratio bas-carbone)
+    const lowCarbon = nuclear + renewables;
+    const fossil = oil + gas + coal;
     const total = lowCarbon + fossil;
     const ratio = total > 0 ? (lowCarbon / total) : null;
-    return { iso3, year, decarb: lowCarbon, carb: fossil, total, ratio };
+
+    return { 
+        iso3, year, 
+        decarb: lowCarbon, carb: fossil, total, ratio,
+        // Nouvelles propriétés détaillées pour la Grid
+        nuclear, oil, gas, coal, renewables 
+    };
 }
 
 // =======================
@@ -97,13 +131,9 @@ async function main() {
     try {
         statusEl.text("Chargement...");
         ensureHatchPattern();
+        svg.style("background-color", "#cbd5e1");
 
-        // --- CORRECTION FOND BLEU ---
-        svg.style("background-color", "#cbd5e1"); // Couleur de l'océan
-
-        // Setup Zoom
         const wrap = d3.select(".viz-wrap");
-        // On s'assure qu'un groupe <g> existe pour appliquer le zoom
         let gZoom = svg.select("g.map-layer");
         if (gZoom.empty()) gZoom = svg.append("g").attr("class", "map-layer");
 
@@ -111,7 +141,6 @@ async function main() {
             .on("zoom", (e) => gZoom.attr("transform", e.transform));
         svg.call(zoom);
 
-        // Chargement
         const [geoData, prodRows, tradeRows, consoRows, popRows] = await Promise.all([
             d3.json(GEO_PATH),
             d3.csv(PROD_PATH),
@@ -128,7 +157,14 @@ async function main() {
         const getRecord = (iso, y) => {
             const k = keyOf(iso, y);
             if (!metricsIndex.has(k)) {
-                metricsIndex.set(k, { iso3: iso, year: y, ratio: null, trade: null, conso: null, decarb: 0, carb: 0, pop: 0, totalProd: 0 });
+                // On initialise l'objet
+                metricsIndex.set(k, { 
+                    iso3: iso, year: y, 
+                    ratio: null, trade: null, conso: null, 
+                    decarb: 0, carb: 0, pop: 0, totalProd: 0,
+                    // Initialisation des nouvelles clés à 0
+                    nuclear: 0, oil: 0, gas: 0, coal: 0, renewables: 0
+                });
                 yearsSet.add(y);
             }
             return metricsIndex.get(k);
@@ -138,7 +174,17 @@ async function main() {
             const p = parseProdRow(row);
             if (p && window.ISO_TO_FR[p.iso3]) {
                 const r = getRecord(p.iso3, p.year);
-                r.ratio = p.ratio; r.decarb = p.decarb; r.carb = p.carb; r.totalProd = p.total;
+                r.ratio = p.ratio; 
+                r.decarb = p.decarb; 
+                r.carb = p.carb; 
+                r.totalProd = p.total;
+                
+                // Stockage des détails pour grid.js
+                r.nuclear = p.nuclear;
+                r.oil = p.oil;
+                r.gas = p.gas;
+                r.coal = p.coal;
+                r.renewables = p.renewables;
             }
         });
 
@@ -166,7 +212,7 @@ async function main() {
 
         const sortedYears = Array.from(yearsSet).sort((a, b) => a - b);
 
-        // 2. AGRÉGATION TRIENNALE
+        // 2. AGRÉGATION TRIENNALE (Pour la carte uniquement, on garde la logique existante)
         const minYear = sortedYears[0];
         const triMap = new Map();
 
@@ -196,7 +242,6 @@ async function main() {
         triYears = Array.from(triYearsSet).sort((a, b) => a - b);
         window.sharedData = { annualData: metricsIndex, years: sortedYears };
 
-        // UI INIT
         updateSliderRange();
 
         metricSelect.on("change", () => {
@@ -222,9 +267,6 @@ async function main() {
     }
 }
 
-// =======================
-// UI & DESSIN
-// =======================
 function updateSliderRange() {
     let minIndex = 0;
     for (let i = 0; i < triYears.length; i++) {
@@ -248,12 +290,10 @@ function updateMap() {
     if (currentMetric === "ratio") {
         colorScale = d3.scaleLinear().domain([0, 0.5, 1]).range(["#ef4444", "#eab308", "#22c55e"]);
     } else if(currentMetric === "trade") {
-        // Trade : Vert (Export -50%) -> Blanc (0%) -> Rouge (Import +50%)
         colorScale = d3.scaleLinear()
             .domain([-50, 0, 50])
             .range(["#16a34a", "#ffffff", "#dc2626"])
-            .clamp(true); // Empêche les couleurs bizarres si > 50%
-            
+            .clamp(true);
      } else {
         colorScale = d3.scaleSequential(d3.interpolateBlues).domain([5000, 50000]);
     }
@@ -293,8 +333,9 @@ function updateUI(metric) {
         <div class="legend-gradient" style="background:${conf.gradient}"></div>
         <div class="legend-labels"><span>${conf.min}</span><span>${conf.max}</span></div>
     `);
-    d3.select("#metricInfoBox .info-content").text(conf.definition);
-    d3.select("#metricInfoBox .info-reading-key").text(conf.readingKey);
+    // MODIFICATION ICI : Utilisation de .html() au lieu de .text() pour interpréter les balises <br> et <b>
+    d3.select("#metricInfoBox .info-content").html(conf.definition);
+    d3.select("#metricInfoBox .info-reading-key").html(conf.readingKey);
 }
 
 function showTooltip(event, d) {
@@ -310,11 +351,9 @@ function showTooltip(event, d) {
             content = `<div><b>${d3.format(".1%")(rec.ratio)}</b> Décarboné</div>
                        <div style="font-size:0.8em; opacity:0.8">Bas-Carbone: ${d3.format(",.0f")(rec.decarb)} TWh</div>`;
         } else if (currentMetric === "trade") {
-            // Logique inversée : Vert = Exportateur (négatif dans le CSV souvent, mais ici on affiche le statut)
-            // Si trade > 0 => Importateur. Si trade < 0 => Exportateur.
             const isImport = rec.trade > 0;
             const label = isImport ? "Importateur" : "Exportateur";
-            const color = isImport ? "#ef4444" : "#22c55e"; // Rouge vs Vert
+            const color = isImport ? "#ef4444" : "#22c55e"; 
             content = `<div style="color:${color};font-weight:bold">${label}</div>
                        <div>${d3.format("+.1f")(rec.trade)}% du mix</div>`;
         } else {
@@ -323,21 +362,16 @@ function showTooltip(event, d) {
     }
 
     tooltip
-        .style("visibility", "visible") // On affiche
+        .style("visibility", "visible")
         .html(`<div style="font-weight:700; margin-bottom:5px; border-bottom:1px solid #ffffff30; padding-bottom:3px;">${frName}</div>${content}`);
 
     moveTooltip(event);
 }
 
 function moveTooltip(event) {
-    // Calcul de la position par rapport à la page entière
-    // On ajoute 15px pour décaler le tooltip du curseur
     const x = event.pageX + 15;
     const y = event.pageY - 15;
-
-    tooltip
-        .style("left", x + "px")
-        .style("top", y + "px");
+    tooltip.style("left", x + "px").style("top", y + "px");
 }
 
 function ensureHatchPattern() {
@@ -360,7 +394,6 @@ function resizeMap() {
     }
 }
 
-// Global Toggle
 window.toggleMainView = function (view) {
     const map = document.getElementById('view-map-container');
     const grid = document.getElementById('view-grid-container');
