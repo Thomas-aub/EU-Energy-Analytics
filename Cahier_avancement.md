@@ -1,19 +1,19 @@
 Journal de bord 
 
 
-##Semaine 1 : 
+## Semaine 1 : 
 
 Choix du projet : visualiser les productions et consomations des energies dans les pays d'europe.
 
 schémas fait main (voir cadrage.md)
 
-##Semaine 2 : 
+## Semaine 2 : 
 
 Document de cadrage, critique par les pairs.
 Idée : ajouté les évenements majeurs de l'europe dans notre visualisation plus tard ?
 
 
-##Semaine 3 :
+## Semaine 3 :
 
 Première page europe.html , pie-chart.html, index.html et donnee.html
 Début d'implémantation des JS avec D3.
@@ -27,10 +27,10 @@ Visiualisation détailler V1 prête.
 
 ![index.html](asset/pictures/index.png)
 
-##Semaine 4 :
+## Semaine 4 :
 
 Carte V1 prête
-![oldCarte](asset/pictures/OldCarte.png)
+![oldCarte](asset/pictures/oldCarte.png)
 
 Ajouter : manque les options imports / export et consomation par habitant sur la carte, sur la page de production
 
@@ -41,7 +41,7 @@ Pie-chart V1 prête
 
 Tooltips mis en place sur la carte, besoin sur la page détail.
 
-##Semaine 5 :
+## Semaine 5 :
 
 Standardisation des calcules, des données et des csv entre les pages, séléction des pays non pertinent (suppression d'Israel, kazaktan ect..)
 
@@ -53,7 +53,12 @@ Fusion entre la page carte et la page pie-chart.
 
 Question : Pertinence de la russie sur notre visualisation ? 
 
-##Semaine 6 :
+A faire :
+Sur la carte, nous allons grisé les pays sur ses périodes et regrouper les années par le lot de 3 afin de limiter les trous.
+Choix des energies dites vertes et des energies impropres, déca / déca + fossile.
+Limitation à des pays du continent européen avec des exceptions pour certains États.
+
+## Semaine 6 :
 
 Uniformisation des pages.
 Merge des branches, préparation de la soutenance et du git.
