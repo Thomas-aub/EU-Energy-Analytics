@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Observatoire Européen de l'Électricité</title>
+    <title>Observatoire de l'Énergie Européenne</title>
 
     <link rel="stylesheet" href="../css/global.css" />
     <link rel="stylesheet" href="./css/map.css" />
@@ -14,11 +14,11 @@
 
 <body>
     <header>
-        <h1>Observatoire de l'Électricité</h1>
+        <h1>Observatoire de l'Énergie Européenne</h1>
         <nav class="main-nav">
             <ul>
-                <li><a class="active" href="#">Carte & Indicateurs</a></li>
-                <li><a href="../production/production.html">Détail par Pays</a></li>
+                <li><a class="active" href="#">Carte & Données</a></li>
+                <li><a href="../production/production.html">Production par Pays</a></li>
             </ul>
         </nav>
     </header>
@@ -140,6 +140,28 @@
 
     <script src="./europe.js"></script>
     <script src="./grid.js"></script>
+     <footer class="source-footer">
+        <div class="container">
+            <div class="source-content">
+                <h3>Méthodologie & Sources</h3>
+                <div class="source-grid">
+                    <div class="source-item">
+                        <strong>Bilans énergétiques :</strong> 
+                        <a href="https://www.iea.org/data-and-statistics" target="_blank" rel="noopener">IEA (International Energy Agency)</a>
+                    </div>
+                    <div class="source-item">
+                        <strong>Production & Consommation :</strong> 
+                        <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener">Our World in Data</a> 
+                        <span class="source-detail">(datasets: electricity-prod-source-stacked & primary-energy-cons)</span>
+                    </div>
+                    <div class="source-item">
+                        <strong>Démographie :</strong> 
+                        <a href="https://ec.europa.eu/eurostat/data/database" target="_blank" rel="noopener">Eurostat</a> / ONU
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>
