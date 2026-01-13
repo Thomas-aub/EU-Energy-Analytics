@@ -89,7 +89,7 @@ function updateTexts() {
     
     switch(gridCategory) {
         case 'mix':
-            title.innerText = `Composition du Mix (${gridYear})`;
+            title.innerText = `Composition du Mix`;
             desc.innerHTML = `Identifiez les piliers de la production électrique :<br><b>Bas-carbonne</b> (Renouvelables et Nucléaire) ou <b>Fossiles</b> (Charbon, Gaz et Pétrole).`;
             break;
         case 'evolution':
