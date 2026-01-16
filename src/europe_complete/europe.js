@@ -58,7 +58,6 @@ let currentMetric = "ratio";
 // DOM Elements
 const svg = d3.select("#map");
 const statusEl = d3.select("#status");
-const metricSelect = d3.select("#metric");
 const yearSlider = d3.select("#year");
 const yearLabel = d3.select("#yearLabel");
 
@@ -244,12 +243,15 @@ async function main() {
 
         updateSliderRange();
 
-        metricSelect.on("change", () => {
-            currentMetric = metricSelect.property("value");
+        window.switchMapMetric = function(metric) {
+            currentMetric = metric;
+            document.getElementById('btn-ratio').className = metric === 'ratio' ? 'view-btn active' : 'view-btn';
+            document.getElementById('btn-trade').className = metric === 'trade' ? 'view-btn active' : 'view-btn';
+            document.getElementById('btn-conso').className = metric === 'conso' ? 'view-btn active' : 'view-btn';
             updateSliderRange();
             updateUI(currentMetric);
             updateMap();
-        });
+        };
 
         yearSlider.on("input", () => { currentTriIndex = +yearSlider.property("value"); updateMap(); });
         window.addEventListener("resize", resizeMap);

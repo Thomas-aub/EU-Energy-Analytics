@@ -41,55 +41,62 @@
     </div>
 
     <div id="view-map-container" class="main-view-container">
-        <div class="container map-layout">
-            <main class="content">
+        <div class="container">
+            <div class="view-header-with-info" style="margin-top: 20px;">
                 <div class="view-header">
                     <h2 class="view-title">Géographie de l'Énergie</h2>
                      <div class="view-desc">
                         Plongez au cœur des dynamiques énergétiques du continent. Cette carte interactive décrypte les stratégies nationales en croisant l'ambition <b>écologique</b> du mix électrique, la <b>souveraineté</b> commerciale face aux voisins et la <b>sobriété</b> des consommations.
                     </div>
                 </div>
-                <div class="viz-row">
-                    <div class="viz-wrap ui-card">
-                        <svg id="map" aria-label="Carte Europe"></svg>
+                
+            </div>
+            <div class="grid-toolbar">
+                <div class="internal-view-switch">
+                    <button id="btn-ratio" class="view-btn active" onclick="switchMapMetric('ratio')">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                            <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                        </svg> Mix Bas-Carbone (Écologie)
+                    </button>
+                    <button id="btn-trade" class="view-btn" onclick="switchMapMetric('trade')">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                            <line x1="5" y1="9" x2="19" y2="9"></line>
+                            <polyline points="15 5 19 9 15 13"></polyline>
+                            <line x1="19" y1="15" x2="5" y2="15"></line>
+                            <polyline points="9 11 5 15 9 19"></polyline>
+                        </svg> Indépendance (Souveraineté)
+                    </button>
+                    <button id="btn-conso" class="view-btn" onclick="switchMapMetric('conso')">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                        </svg> Conso / Habitant (Sobriété)
+                    </button>
+                </div>
+                <div class="slider-container">
+                    <span style="font-weight:600; color:#475569;">Année : <span id="yearLabel" style="color:#0f172a; min-width:45px; display:inline-block">2024</span></span>
+                    <input id="year" type="range" min="1971" max="2024" step="1" value="2024" />
+                </div>
+                <div class="legend-container">
+                    <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.85rem; color:#475569;">Légende</label>
+                    <div id="legendGradient" class="legend-gradient"></div>
+                    <div class="legend-labels">
+                        <span id="legendMin">Min</span>
+                        <span id="legendMax">Max</span>
                     </div>
-                    <aside class="controls map-controls-card">
-                        <h2>Paramètres</h2>
-                        <div class="filter-group">
-                            <label for="metric" style="display:block; margin-bottom:8px; font-weight:600; font-size:0.9rem; color:#475569;">
-                                Indicateur à visualiser
-                            </label>
-                            <div class="styled-select-wrapper">
-                                <select id="metric">
-                                    <option value="ratio">Mix Bas-Carbone (Écologie)</option>
-                                    <option value="trade">Indépendance (Souveraineté)</option>
-                                    <option value="conso">Conso / Habitant (Sobriété)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="slider-container">
-                            <span style="font-weight:600; color:#475569; min-width: 60px;">Année : <span id="yearLabel" style="color:#0f172a;">2024</span></span>
-                            <input id="year" type="range" min="1971" max="2024" step="1" value="2024" />
-                        </div>
-                        <div class="legend-container">
-                            <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.85rem; color:#475569;">Légende</label>
-                            <div id="legendGradient" class="legend-gradient"></div>
-                            <div class="legend-labels">
-                                <span id="legendMin">Min</span>
-                                <span id="legendMax">Max</span>
-                            </div>
-                        </div>
-                        <div id="metricInfoBox" class="info-box">
-                            <span class="info-title">Comprendre l'indicateur</span>
-                            <div id="infoContent" class="info-content">...</div>
-                            <div id="infoKey" class="info-reading-key">...</div>
-                        </div>
-                    </aside>
                 </div>
-                <div class="status" id="status" style="margin-top:10px; font-size:0.8rem; color:#94a3b8; text-align:right;">
-                    Chargement des données...
+            </div>
+            <div class="viz-wrap ui-card">
+                <svg id="map" aria-label="Carte Europe"></svg>
+            </div>
+            <div class="status" id="status" style="margin-top:10px; font-size:0.8rem; color:#94a3b8; text-align:right;">
+                Chargement des données...
+            </div>
+            <div id="metricInfoBox" class="info-box">
+                    <span class="info-title">Comprendre l'indicateur</span>
+                    <div id="infoContent" class="info-content">...</div>
+                    <div id="infoKey" class="info-reading-key">...</div>
                 </div>
-            </main>
         </div>
     </div>
 

@@ -5,16 +5,6 @@ body {
 }
 
 /* --- LAYOUT PRINCIPAL --- */
-.viz-wrap {
-    position: relative;
-    width: 100%;
-    height: 650px;
-    min-height: 600px;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
 #map {
     width: 100%;
     height: 100%;
@@ -47,6 +37,26 @@ body {
 }
 
 /* --- HEADERS --- */
+.view-header-with-info {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 25px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    align-items: start;
+}
+
+.view-header-with-info .view-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.view-header-with-info .info-box {
+    margin-top: 0;
+}
+
 .view-header {
     margin-bottom: 25px;
     padding-bottom: 15px;
@@ -76,7 +86,7 @@ body {
 /* --- UI ELEMENTS --- */
 .ui-card {
     background: white;
-    border-radius: 12px;
+    border-radius: 6px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
@@ -88,11 +98,11 @@ body {
     padding: 4px;
     border-radius: 8px;
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 175px;
+    right: 50px;
     z-index: 500;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.39);
+    border: 1px solid #bec1c7;
 }
 
 .view-btn {
@@ -143,65 +153,14 @@ input[type=range] {
 }
 
 /* --- MAP SPECIFIC --- */
-.map-layout .viz-row {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 20px;
-    align-items: start;
-    margin-bottom: 20px;
-}
-
-.map-controls-card {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.map-controls-card h2 {
-    font-size: 1.1rem;
-    margin: 0;
-    color: #0f172a;
-    font-weight: 700;
-    border-bottom: 2px solid #f1f5f9;
-    padding-bottom: 12px;
-}
-
-.styled-select-wrapper {
+.viz-wrap {
     position: relative;
-}
-
-select#metric {
     width: 100%;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    background-color: #fff;
-    color: #334155;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    appearance: none;
-    transition: border-color 0.2s;
-}
-
-select#metric:hover {
-    border-color: #94a3b8;
-}
-
-.styled-select-wrapper::after {
-    content: "▼";
-    font-size: 0.7rem;
-    color: #64748b;
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
+    height: 650px;
+    min-height: 600px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .info-box {
@@ -262,7 +221,10 @@ select#metric:hover {
 .grid-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    /* Remplacez gap: 15px; par : */
+    column-gap: 15px; /* Espacement horizontal uniquement */
+    row-gap: 0px;    /* Aucun espacement vertical */
+    
     align-items: center;
     margin-bottom: 30px;
     position: sticky;
@@ -292,14 +254,14 @@ select#metric:hover {
 
 #charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 15px;
     width: 100%;
     padding-bottom: 50px;
 }
 
 .country-card {
-    padding: 12px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -315,8 +277,8 @@ select#metric:hover {
     font-weight: 700;
     margin-bottom: 8px;
     text-align: center;
-    font-size: 0.9rem;
-    height: 25px;
+    font-size: 0.75rem;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
