@@ -54,6 +54,7 @@ let triMetricsIndex = new Map();
 let triYears = [];
 let currentTriIndex = 0;
 let currentMetric = "ratio";
+window.isoToEn = new Map();
 
 // DOM Elements
 const svg = d3.select("#map");
@@ -149,6 +150,12 @@ async function main() {
         ]);
 
         geo = geoData;
+
+        prodRows.forEach(d => {
+            if (d.Code && d.Entity) {
+                isoToEn.set(d.Code, d.Entity);
+            }
+        });
 
         // 1. CONSOLIDATION ANNUELLE
         metricsIndex = new Map();
@@ -322,8 +329,19 @@ function updateMap() {
         })
         .on("mousemove", moveTooltip)
         .on("click", (e, d) => {
-            const frName = window.ISO_TO_FR[getIso3(d)];
-            if (frName) window.location.href = `../production/production.html?country=${encodeURIComponent(frName)}`;
+            const iso = getIso3(d);
+            const enName = isoToEn.get(iso);
+
+            if (enName) {
+                if (window.updateProductionChart) {
+                    window.updateProductionChart(enName);
+                }
+
+                const targetElement = document.getElementById('production-section');
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
         });
 }
 

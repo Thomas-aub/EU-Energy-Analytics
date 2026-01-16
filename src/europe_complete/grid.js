@@ -191,7 +191,19 @@ function drawGrid() {
     sortedCountries.forEach(iso => {
         const frName = window.ISO_TO_FR[iso];
         const card = container.append("div").attr("class", "country-card ui-card");
-        card.on("click", () => window.location.href = `../production/production.html?country=${encodeURIComponent(frName)}`);
+        card.on("click", () => {
+            if (window.isoToEn) {
+                const enName = window.isoToEn.get(iso);
+                if (enName && window.updateProductionChart) {
+                    window.updateProductionChart(enName);
+
+                    const targetElement = document.getElementById('production-section');
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+        });
         card.append("div").attr("class", "country-title").text(frName);
         
         const svg = card.append("svg").attr("class", "responsive-svg").attr("viewBox", "0 0 200 120");
