@@ -78,3 +78,11 @@
 <img src="asset/pictures/productionFinal.png" alt="Vue Production Finale" width="45%">
 <img src="asset/pictures/CarteFinal.png" alt="Vue Carte Finale" width="45%">
 </div>
+
+## Semaine 7 : Must to do et nice to do
+
+* **Must to do :** Améliorer la navigation et la rendre plus cohérente; Carte: changer le dropdown de choix; Small multiples : améliorer la densité et lisibilité des graphiques
+* **Nice to do :** Améliorer le lien entre timeline et carte
+
+* **Refactorisation :** Correction du code et fusion des pages carte et détail. Pies simplifié.
+* **Vue Production :** Terminée, Carte + Graphe sur la même page et scroll automatique lors de la sélection d'un pays.
